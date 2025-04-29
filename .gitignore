@@ -13,3 +13,9 @@
 
 # Project
 !*.uproject
+
+# Git
+!.gitignore
+!.gitattributes
+!LICENSE
+!README.md

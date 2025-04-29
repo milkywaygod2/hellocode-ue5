@@ -6,9 +6,11 @@
 # Selected folders to keep
 
 # Config
+!Config/
 !Config/*
 
 # Source
+!Source/
 !Source/*
 
 # Project

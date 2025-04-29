@@ -13,6 +13,10 @@
 !Source/
 !Source/**/*
 
+# Content
+#!Content/      #Paid LFS required
+#!Content/**/*  #Paid LFS required
+
 # Project
 !*.uproject
 

@@ -7,11 +7,11 @@
 
 # Config
 !Config/
-!Config/*
+!Config/**/*
 
 # Source
 !Source/
-!Source/*
+!Source/**/*
 
 # Project
 !*.uproject

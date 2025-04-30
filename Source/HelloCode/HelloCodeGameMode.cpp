@@ -2,7 +2,7 @@
 
 
 #include "HelloCodeGameMode.h"
-#include "Character/HelloCharacter.h"
+#include "ACharacter/HelloCharacter.h"
 
 AHelloCodeGameMode::AHelloCodeGameMode()
 {

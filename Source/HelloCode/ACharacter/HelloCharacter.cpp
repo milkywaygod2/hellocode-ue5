@@ -220,18 +220,20 @@ void AHelloCharacter::MyOnComponentEndOverlap(UPrimitiveComponent* pOverlappedCo
 void AHelloCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-	for (TActorIterator<ATargetPoint> itActorPtr(GetWorld()); itActorPtr; ++itActorPtr)
-	{
-		ATargetPoint* pTargetPoint = *itActorPtr;
-		if (pTargetPoint)
-		{
-			ArrTargetPointPtr.Add(pTargetPoint);
-			UE_LOG(LogTemp, Warning, TEXT("Found TargetPoint: %s"), *pTargetPoint->GetName());
-		}
-	}
-	auto predLocation = [](const AActor& A, const AActor& B) ->bool { return A.GetActorLocation().Y < B.GetActorLocation().Y; };
-	ArrTargetPointPtr.Sort(predLocation);
-	CurrentLocation = ((ArrTargetPointPtr.Num() / 2) + (ArrTargetPointPtr.Num() % 2) - 1/*toIndex0*/);
+
+	// TODO: target point
+	// for (TActorIterator<ATargetPoint> itActorPtr(GetWorld()); itActorPtr; ++itActorPtr)
+	// {
+	// 	ATargetPoint* pTargetPoint = *itActorPtr;
+	// 	if (pTargetPoint)
+	// 	{
+	// 		ArrTargetPointPtr.Add(pTargetPoint);
+	// 		UE_LOG(LogTemp, Warning, TEXT("Found TargetPoint: %s"), *pTargetPoint->GetName());
+	// 	}
+	// }
+	// auto predLocation = [](const AActor& A, const AActor& B) ->bool { return A.GetActorLocation().Y < B.GetActorLocation().Y; };
+	// ArrTargetPointPtr.Sort(predLocation);
+	// CurrentLocation = ((ArrTargetPointPtr.Num() / 2) + (ArrTargetPointPtr.Num() % 2) - 1/*toIndex0*/);
 }
 
 void AHelloCharacter::ScoreUp()

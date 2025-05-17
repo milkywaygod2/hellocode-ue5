@@ -54,16 +54,14 @@ AHelloCharacter::AHelloCharacter()
 	}
 	else
 	{
-		const ConstructorHelpers::FObjectFinder<USkeletalMesh> AssetSkeletalMesh(TEXT("SkeletalMesh'/Engine/EditorMeshes/SkeletalMesh/DefaultSkeletalMesh.DefaultSkeletalMesh'"));
-		//ConstructorHelpers::FObjectFinder<UAnimBlueprint> AssetAnim(TEXT("AnimBlueprint'/Game/HelloCode/Character/Animation/HelloAnimBP.HelloAnimBP'"));
-		if (/*AssetAnim.Succeeded() &&*/ AssetSkeletalMesh.Succeeded())
+		const ConstructorHelpers::FObjectFinder<USkeletalMesh> AssetSkeletalMesh(TEXT("SkeletalMesh'/Game/FBX/jellyfish.jellyfish'"));
+		if (AssetSkeletalMesh.Succeeded())
 		{
 			GetMesh()->SetSkeletalMesh(AssetSkeletalMesh.Object);
-			//GetMesh()->SetAnimInstanceClass(AssetAnim.Object->GeneratedClass);
 		}
 		else
 		{
-			UE_LOG(LogTemp, Warning, TEXT("Failed to load AnimBlueprint or SkeletalMesh!"));
+			UE_LOG(LogTemp, Warning, TEXT("Failed to load SkeletalMesh!"));
 		}
 	}
 
@@ -221,6 +219,19 @@ void AHelloCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
+	//ConstructorHelpers::FObjectFinder<UAnimBlueprint> AssetAnim(TEXT("AnimBlueprint'/Game/HelloCode/Character/Animation/HelloAnimBP.HelloAnimBP'")); // 레핑-상태연동기능추가(동적변경등 특수한 상황아니면 에디터 생성후 연결권장)
+	UAnimSequence* AssetAnim = LoadObject<UAnimSequence>(nullptr, TEXT("/Script/Engine.AnimSequence'/Game/FBX/jellyfish_Anim.jellyfish_Anim'"));
+	if (AssetAnim)
+	{
+		//GetMesh()->SetAnimInstance(AssetAnim.Object->GeneratedClass);
+		GetMesh()->SetAnimationMode(EAnimationMode::AnimationSingleNode);
+		GetMesh()->PlayAnimation(AssetAnim, true);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Failed to load Anim!"));
+	}
+	
 	// TODO: target point
 	// for (TActorIterator<ATargetPoint> itActorPtr(GetWorld()); itActorPtr; ++itActorPtr)
 	// {

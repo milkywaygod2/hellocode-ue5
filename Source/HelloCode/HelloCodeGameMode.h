@@ -30,4 +30,6 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly) int32 NumCoinsForSpeedIncrease;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite) float GameSpeedIncrease;
 
+	virtual void BeginPlay() override;
+
 };

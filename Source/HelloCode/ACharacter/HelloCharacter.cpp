@@ -18,55 +18,19 @@ AHelloCharacter::AHelloCharacter()
 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
-	
-	// making character	
-	if (bTestCharacterMesh)
+	// SkeletalMesh
+	const ConstructorHelpers::FObjectFinder<USkeletalMesh> AssetSkeletalMesh(TEXT("SkeletalMesh'/Game/FBX/jellyfish.jellyfish'"));
+	if (AssetSkeletalMesh.Succeeded())
 	{
-		//TODO: skeletal mesh
-		USkeletalMesh* AssetSkeletalMesh = NewObject<USkeletalMesh>(this, TEXT("CustomSkeletalMesh"));
-		//AssetSkeletalMesh = CreateDefaultSubobject<USkeletalMesh>(TEXT("CustomSkeletalMesh"));
-		//TODO: animBP
-		//UClass* AssetAnimBP;
-		if (AssetSkeletalMesh)
-		{
-			// 1. 리소스 초기화
-			AssetSkeletalMesh->InitResources();
-
-			// 2. 머티리얼 추가
-			// UMaterial* pMaterial = LoadObject<UMaterial>(nullptr, TEXT("Material'/Game/Materials/ExampleMaterial.ExampleMaterial'"));
-			// if (pMaterial)
-			// {
-			// 	AssetSkeletalMesh->Materials.Add(FSkeletalMaterial(pMaterial));
-			// }
-
-			// 3. LOD(Level of Detail) 섹션 추가
-			// FSkeletalMeshLODInfo& LODInfo = AssetSkeletalMesh->AddLODInfo();
-			// LODInfo.ScreenSize = 1.0f; // 디테일 레벨 크기 설정
-		}
-		else
-		{
-			UE_LOG(LogTemp, Warning, TEXT("Failed to create Skeletal Mesh!"));
-		}
-		
-		//AssetAnimBP = NewObject<UClass>();
-		GetMesh()->SetSkeletalMesh(AssetSkeletalMesh);
-		//GetMesh()->SetAnimInstanceClass(AssetAnimBP);
+		GetMesh()->SetSkeletalMesh(AssetSkeletalMesh.Object);
 	}
 	else
 	{
-		const ConstructorHelpers::FObjectFinder<USkeletalMesh> AssetSkeletalMesh(TEXT("SkeletalMesh'/Game/FBX/jellyfish.jellyfish'"));
-		if (AssetSkeletalMesh.Succeeded())
-		{
-			GetMesh()->SetSkeletalMesh(AssetSkeletalMesh.Object);
-		}
-		else
-		{
-			UE_LOG(LogTemp, Warning, TEXT("Failed to load SkeletalMesh!"));
-		}
+		UE_LOG(LogTemp, Warning, TEXT("Failed to load SkeletalMesh!"));
 	}
 
 	// setting character
-	GetCapsuleComponent()->InitCapsuleSize(42.f, 96.f);
+	GetCapsuleComponent()->InitCapsuleSize(42.f, 24.f);
 	GetMesh()->SetRelativeLocation(FVector(0.0f, 0.0f, -GetCapsuleComponent()->GetScaledCapsuleHalfHeight()));
 	GetMesh()->SetRelativeRotation(FRotator(0.0f, -90.0f, 0.0f));
 	GetCharacterMovement()->JumpZVelocity = 1450.0f;
@@ -78,17 +42,11 @@ AHelloCharacter::AHelloCharacter()
 	SpringArmComp->SetupAttachment(RootComponent);
 	SpringArmComp->TargetArmLength = 10.0f;
 	SpringArmComp->AddRelativeLocation(FVector(0.0f, 0.0f, 20.0f));
-	//SpringArmComp->bUsePawnControlRotation = true;
-	//SpringArmComp->bEnableCameraLag = true;
-	//SpringArmComp->CameraLagSpeed = 3.0f;
-	//SpringArmComp->bEnableCameraRotationLag = true;
-	//SpringArmComp->CameraRotationLagSpeed = 3.0f;
-	//SpringArmComp->SocketOffset = FVector(0.0f, 0.0f, 50.0f);
+	
 	CameraComp = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
 	check(CameraComp);
 	CameraComp->SetupAttachment(SpringArmComp, USpringArmComponent::SocketName);
 	CameraComp->AddRelativeRotation(FQuat(FRotator(-5.0f, 0.0f, 0.0f)));
-	//CameraComp->bUsePawnControlRotation = false;
 	//CameraComp->FieldOfView = 90.0f;
 
 	// init variables
@@ -98,14 +56,6 @@ AHelloCharacter::AHelloCharacter()
 	GameScore = 0;
 	MovementSpeed = 10.0f;
 	RotationSpeed = 20.0f;
-	//m_pHitSound = CreateDefaultSubobject<UAudioComponent>(TEXT("HitSound"));
-	//m_pHitSound->SetupAttachment(RootComponent);
-	//m_pCoinSound = CreateDefaultSubobject<UAudioComponent>(TEXT("CoinSound"));
-	//m_pCoinSound->SetupAttachment(RootComponent);
-	//m_pHitSound->SetSound(LoadObject<USoundBase>(nullptr, TEXT("SoundWave'/Game/HelloCode/Sound/Hit.Hit'")));
-	//m_pCoinSound->SetSound(LoadObject<USoundBase>(nullptr, TEXT("SoundWave'/Game/HelloCode/Sound/Coin.Coin'")));
-	//m_pHitSound->SetAutoActivate(false);
-	//m_pCoinSound->SetAutoActivate(false);
 
 	// init input
 	AutoPossessPlayer = EAutoReceiveInput::Player0;
@@ -219,7 +169,8 @@ void AHelloCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
-	//ConstructorHelpers::FObjectFinder<UAnimBlueprint> AssetAnim(TEXT("AnimBlueprint'/Game/HelloCode/Character/Animation/HelloAnimBP.HelloAnimBP'")); // 레핑-상태연동기능추가(동적변경등 특수한 상황아니면 에디터 생성후 연결권장)
+	// 레핑-상태연동기능추가(동적변경등 특수한 상황아니면 에디터 생성후 연결권장)
+	//ConstructorHelpers::FObjectFinder<UAnimBlueprint> AssetAnim(TEXT("AnimBlueprint'/Game/HelloCode/Character/Animation/HelloAnimBP.HelloAnimBP'"));
 	UAnimSequence* AssetAnim = LoadObject<UAnimSequence>(nullptr, TEXT("/Script/Engine.AnimSequence'/Game/FBX/jellyfish_Anim.jellyfish_Anim'"));
 	if (AssetAnim)
 	{

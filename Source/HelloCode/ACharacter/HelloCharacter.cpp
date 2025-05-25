@@ -3,13 +3,12 @@
 
 #include "HelloCharacter.h"
 
-#include "EngineUtils.h"
 #include "Camera/CameraComponent.h"
-#include "Components/AudioComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Engine/TargetPoint.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "PhysicsEngine/PhysicsAsset.h"
 
 
 // Sets default values
@@ -20,9 +19,14 @@ AHelloCharacter::AHelloCharacter()
 
 	// SkeletalMesh
 	const ConstructorHelpers::FObjectFinder<USkeletalMesh> AssetSkeletalMesh(TEXT("SkeletalMesh'/Game/FBX/jellyfish.jellyfish'"));
-	if (AssetSkeletalMesh.Succeeded())
-	{
+	const ConstructorHelpers::FObjectFinder<UPhysicsAsset> AssetPhysics(TEXT("PhysicsAsset'/Game/FBX/jellyfish_PhysicsAsset.jellyfish_PhysicsAsset'"));
+	
+	if (AssetSkeletalMesh.Succeeded() && AssetPhysics.Succeeded())
+	{		
 		GetMesh()->SetSkeletalMesh(AssetSkeletalMesh.Object);
+		
+		// TODO: SetPhysicsAsset 적용..
+		GetMesh()->SetPhysicsAsset(AssetPhysics.Object);
 	}
 	else
 	{
@@ -30,7 +34,6 @@ AHelloCharacter::AHelloCharacter()
 	}
 
 	// setting character
-	GetCapsuleComponent()->InitCapsuleSize(42.f, 24.f);
 	GetMesh()->SetRelativeLocation(FVector(0.0f, 0.0f, -GetCapsuleComponent()->GetScaledCapsuleHalfHeight()));
 	GetMesh()->SetRelativeRotation(FRotator(0.0f, -90.0f, 0.0f));
 	GetCharacterMovement()->JumpZVelocity = 1450.0f;
@@ -48,6 +51,7 @@ AHelloCharacter::AHelloCharacter()
 	CameraComp->SetupAttachment(SpringArmComp, USpringArmComponent::SocketName);
 	CameraComp->AddRelativeRotation(FQuat(FRotator(-5.0f, 0.0f, 0.0f)));
 	//CameraComp->FieldOfView = 90.0f;
+	//CameraComp->bUsePawnControlRotation = true; // Pawn의 회전값을 사용하도록 설정
 
 	// init variables
 	CurrentLocation = 0;

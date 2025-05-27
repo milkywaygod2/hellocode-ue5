@@ -1,10 +1,10 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "HelloCodePlayerController.h"
+#include "HelloPlayerController.h"
 #include "EnhancedInputSubsystems.h"
 
-void AHelloCodePlayerController::BeginPlay()
+void AHelloPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
 

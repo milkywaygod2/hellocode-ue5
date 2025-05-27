@@ -1,42 +1,30 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "HelloCodeGameMode.h"
+#include "HelloGameMode.h"
 #include "HelloCharacter.h"
 
-AHelloCodeGameMode::AHelloCodeGameMode()
+AHelloGameMode::AHelloGameMode()
 {
-	DefaultPawnClass = AHelloCharacter::StaticClass();
-
-	NumCoinsForSpeedIncrease = 5;
-	GameSpeed = 10.0f;
-	GameSpeedIncrease = 5.0f;
-	GameLevel = 1;
+	//DefaultPawnClass = AHelloCharacter::StaticClass();
+	static ConstructorHelpers::FClassFinder<APawn> PlayerPawnClassFinder(TEXT("/Game/BP_Core/BP_HelloCharacter"));
+	DefaultPawnClass = PlayerPawnClassFinder.Class;
 }
 
-void AHelloCodeGameMode::ScoreUp(unsigned int ScoreUp)
-{
-	if (ScoreUp != 0 && ((ScoreUp % NumCoinsForSpeedIncrease) == 0))
-	{
-		GameSpeed += GameSpeedIncrease;
-		GameLevel++;
-	}
-}
-
-void AHelloCodeGameMode::BeginPlay()
+void AHelloGameMode::BeginPlay()
 {
 	Super::BeginPlay();
 
 	// 1 정석
-	const FString ClassName1 = FString::Printf(TEXT("%s BeginPlay, until %d!"), *FString("HelloCodeGameMode"), 2040);
+	const FString ClassName1 = FString::Printf(TEXT("%s BeginPlay, until %d!"), *FString("HelloGameMode"), 2040);
 	UE_LOG(LogTemp, Warning, TEXT("%s"), *ClassName1);
 
 	// 2 UE_LOG매크로 지원
-	const FString ClassName2 = TEXT("HelloCodeGameMode");
+	const FString ClassName2 = TEXT("HelloGameMode");
 	UE_LOG(LogTemp, Warning, TEXT("%s BeginPlay, until %d!"), *ClassName2, 2040);
 
 	// 3 Format() 가변인자 지원
-	const FString ClassName3 = TEXT("HelloCodeGameMode");
+	const FString ClassName3 = TEXT("HelloGameMode");
 	const FString OtherStringPart = TEXT("BeginPlay, until");
 	int32 Year = 2040;
 	TArray<FStringFormatArg> Args;

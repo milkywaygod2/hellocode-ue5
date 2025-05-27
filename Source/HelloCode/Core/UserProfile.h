@@ -27,6 +27,6 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Unit")
 	TSubclassOf<UObject> UClassOfPlayer;
 	
-	UPROPERTY(EditAnywhere, meta=(MetaClass="GameMode"), Category = "Unit")
+	UPROPERTY(EditAnywhere, meta=(MetaClass="/Script/Engine.GameMode"), Category = "Unit")
 	FSoftClassPath UClassGameMode;
 };

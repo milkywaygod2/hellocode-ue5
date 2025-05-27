@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerController.h"
-#include "HelloCodePlayerController.generated.h"
+#include "HelloPlayerController.generated.h"
 
 class UInputMappingContext;
 
@@ -12,7 +12,7 @@ class UInputMappingContext;
  * 
  */
 UCLASS()
-class HELLOCODE_API AHelloCodePlayerController : public APlayerController
+class HELLOCODE_API AHelloPlayerController : public APlayerController
 {
 	GENERATED_BODY()
 	

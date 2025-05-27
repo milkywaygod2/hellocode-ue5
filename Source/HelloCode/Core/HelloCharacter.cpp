@@ -2,20 +2,43 @@
 
 
 #include "HelloCharacter.h"
+//#include "HelloShooterProjectile.h"
 
+#include "Animation/AnimInstance.h"
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
-#include "Engine/TargetPoint.h"
+#include "Components/CapsuleComponent.h"
+#include "Components/SkeletalMeshComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "EnhancedInputComponent.h"
+#include "EnhancedInputSubsystems.h"
+#include "InputActionValue.h"
+#include "Engine/LocalPlayer.h"
+
 #include "PhysicsEngine/PhysicsAsset.h"
 
+DEFINE_LOG_CATEGORY(LogHelloCharacter);
 
 // Sets default values
 AHelloCharacter::AHelloCharacter()
 {
 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
+
+	bHasWeapon = false;
+	
+	// Set size for collision capsule
+	GetCapsuleComponent()->InitCapsuleSize(55.f, 96.0f);
+		
+	
+
+	Mesh1P = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("CharacterMesh1P"));
+	Mesh1P->SetOnlyOwnerSee(true);
+	Mesh1P->SetupAttachment(CameraComp);
+	Mesh1P->bCastDynamicShadow = false;
+	Mesh1P->CastShadow = false;
+	Mesh1P->SetRelativeLocation(FVector(-30.f, 0.f, -150.f));
 
 	// SkeletalMesh
 	const ConstructorHelpers::FObjectFinder<USkeletalMesh> AssetSkeletalMesh(TEXT("SkeletalMesh'/Game/FBX/jellyfish.jellyfish'"));
@@ -24,9 +47,7 @@ AHelloCharacter::AHelloCharacter()
 	if (AssetSkeletalMesh.Succeeded() && AssetPhysics.Succeeded())
 	{		
 		GetMesh()->SetSkeletalMesh(AssetSkeletalMesh.Object);
-		
-		// TODO: SetPhysicsAsset 적용..
-		GetMesh()->SetPhysicsAsset(AssetPhysics.Object);
+		GetMesh()->SetPhysicsAsset(AssetPhysics.Object); // TODO: SetPhysicsAsset 적용..
 	}
 	else
 	{
@@ -52,12 +73,9 @@ AHelloCharacter::AHelloCharacter()
 	CameraComp->AddRelativeRotation(FQuat(FRotator(-5.0f, 0.0f, 0.0f)));
 	//CameraComp->FieldOfView = 90.0f;
 	//CameraComp->bUsePawnControlRotation = true; // Pawn의 회전값을 사용하도록 설정
-
+	// Create a CameraComponent
+	
 	// init variables
-	CurrentLocation = 0;
-	DesiredLocation = FVector(0.0f, 0.0f, 0.0f);
-	bPushed = false;
-	GameScore = 0;
 	MovementSpeed = 10.0f;
 	RotationSpeed = 20.0f;
 
@@ -128,35 +146,6 @@ void AHelloCharacter::RotateRight(float Value)
 	}	
 }
 
-void AHelloCharacter::MoveToTargetR()
-{
-	if (Controller != nullptr)
-	{
-		if (CurrentLocation < ArrTargetPointPtr.Num() - 1/*toIndex0*/)
-		{
-			++CurrentLocation;
-		}
-		else
-		{
-			// nothing	to do
-		}
-	}
-}
-
-void AHelloCharacter::MoveToTargetL()
-{
-	if (Controller != nullptr)
-	{
-		if (CurrentLocation > 0)
-		{
-			--CurrentLocation;
-		}
-		else
-		{
-			// nothing	to do
-		}
-	}
-}
 
 void AHelloCharacter::MyOnComponentOverlap(UPrimitiveComponent* pOverlappedComponent, AActor* pOtherActor,
 	UPrimitiveComponent* pOtherComp, int32 nOtherBodyIndex, bool bFromSweep, const FHitResult& Hit)
@@ -168,63 +157,55 @@ void AHelloCharacter::MyOnComponentEndOverlap(UPrimitiveComponent* pOverlappedCo
 {
 }
 
+void AHelloCharacter::Move(const FInputActionValue& Value)
+{
+	FVector2D MovementVector = Value.Get<FVector2D>();
+	if (Controller != nullptr)
+	{
+		AddMovementInput(GetActorForwardVector(), MovementVector.Y);
+		AddMovementInput(GetActorRightVector(), MovementVector.X);
+	}
+}
+
+void AHelloCharacter::Look(const FInputActionValue& Value)
+{
+	FVector2D LookAxisVector = Value.Get<FVector2D>();
+	if (Controller != nullptr)
+	{
+		AddControllerYawInput(LookAxisVector.X);
+		AddControllerPitchInput(LookAxisVector.Y);
+	}
+}
+
 // Called when the game starts or when spawned
 void AHelloCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
-	// 레핑-상태연동기능추가(동적변경등 특수한 상황아니면 에디터 생성후 연결권장)
-	//ConstructorHelpers::FObjectFinder<UAnimBlueprint> AssetAnim(TEXT("AnimBlueprint'/Game/HelloCode/Character/Animation/HelloAnimBP.HelloAnimBP'"));
+	if (APlayerController* PlayerController = Cast<APlayerController>(Controller))
+	{
+		if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
+		{
+			Subsystem->AddMappingContext(DefaultMappingContext, 0);
+		}
+	}
+	
 	UAnimSequence* AssetAnim = LoadObject<UAnimSequence>(nullptr, TEXT("/Script/Engine.AnimSequence'/Game/FBX/jellyfish_Anim.jellyfish_Anim'"));
 	if (AssetAnim)
 	{
-		//GetMesh()->SetAnimInstance(AssetAnim.Object->GeneratedClass);
 		GetMesh()->SetAnimationMode(EAnimationMode::AnimationSingleNode);
 		GetMesh()->PlayAnimation(AssetAnim, true);
 	}
 	else
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Failed to load Anim!"));
-	}
-	
-	// TODO: target point
-	// for (TActorIterator<ATargetPoint> itActorPtr(GetWorld()); itActorPtr; ++itActorPtr)
-	// {
-	// 	ATargetPoint* pTargetPoint = *itActorPtr;
-	// 	if (pTargetPoint)
-	// 	{
-	// 		ArrTargetPointPtr.Add(pTargetPoint);
-	// 		UE_LOG(LogTemp, Warning, TEXT("Found TargetPoint: %s"), *pTargetPoint->GetName());
-	// 	}
-	// }
-	// auto predLocation = [](const AActor& A, const AActor& B) ->bool { return A.GetActorLocation().Y < B.GetActorLocation().Y; };
-	// ArrTargetPointPtr.Sort(predLocation);
-	// CurrentLocation = ((ArrTargetPointPtr.Num() / 2) + (ArrTargetPointPtr.Num() % 2) - 1/*toIndex0*/);
-}
-
-void AHelloCharacter::ScoreUp()
-{
-	
+	}	
 }
 
 // Called every frame
 void AHelloCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	if (ArrTargetPointPtr.Num() > 0)
-	{
-		FVector vTargetLocation = ArrTargetPointPtr[CurrentLocation]->GetActorLocation();
-		vTargetLocation.Z = GetActorLocation().Z;
-		vTargetLocation.X = GetActorLocation().X;
-		if (vTargetLocation != GetActorLocation())
-		{
-			SetActorLocation(FMath::Lerp(GetActorLocation(), vTargetLocation, MovementSpeed * DeltaTime)); // Lerp: linear interpolation
-		}
-	}
-	else
-	{
-		// nothing to do
-	}
 }
 
 // Called to bind functionality to input
@@ -232,8 +213,20 @@ void AHelloCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 	check(InputComponent);
-	InputComponent->BindAction("MoveToTargetR", IE_Pressed, this, &AHelloCharacter::MoveToTargetR);
-	InputComponent->BindAction("MoveToTargetL", IE_Pressed, this, &AHelloCharacter::MoveToTargetL);
+
+	if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerInputComponent))
+	{
+		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Started, this, &ACharacter::Jump);
+		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &ACharacter::StopJumping);
+		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &AHelloCharacter::Move);
+		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &AHelloCharacter::Look);
+	}
+	else
+	{
+		UE_LOG(LogHelloCharacter, Error, TEXT("'%s' Failed to find an Enhanced Input Component! This template is built to use the Enhanced Input system. If you intend to use the legacy system, then you will need to update this C++ file."), *GetNameSafe(this));
+	}
+
+	// old
 	InputComponent->BindAction("Jump", IE_Pressed, this, &ACharacter::Jump);
 	InputComponent->BindAction("Jump", IE_Released, this, &ACharacter::StopJumping);
 	InputComponent->BindAxis("MoveForward", this, &AHelloCharacter::MoveForward);

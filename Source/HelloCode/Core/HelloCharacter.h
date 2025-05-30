@@ -52,7 +52,10 @@ private:
 	// info
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Weapon, meta = (AllowPrivateAccess = "true"))
 	bool bHasWeapon;
-		
+
+	float InputMouseTurnSpeed{10.f};
+	float InputKeyboardMoveSpeed{30.f};
+
 protected:
 	// move
 	void Move(const FInputActionValue& Value);
@@ -70,16 +73,6 @@ public:
 	USkeletalMeshComponent* GetCharacterMesh() const { return Mesh1P; }
 	UCameraComponent* GetFirstPersonCameraComponent() const { return CameraComp; }
 	
-	
-	// old
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Camera) float MinPitchAngle = -45.0f;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Camera) float MaxPitchAngle = 45.0f;
-	void LookRight(float Value);
-	void LookUpper(float Value);
-	void MoveForward(float Value);
-	void MoveRight(float Value);
-	void RotateRight(float Value);
-	UPROPERTY(EditAnywhere, Category = Logic) TArray<class ATargetPoint*> ArrTargetPointPtr;
 	UPROPERTY(EditAnywhere, Category = Logic) float MovementSpeed;
 	UPROPERTY(EditAnywhere, Category = Logic) float RotationSpeed;
 

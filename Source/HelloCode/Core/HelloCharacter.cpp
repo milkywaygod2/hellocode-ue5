@@ -7,7 +7,6 @@
 #include "Animation/AnimInstance.h"
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
-#include "Components/CapsuleComponent.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
@@ -31,7 +30,7 @@ AHelloCharacter::AHelloCharacter()
 	// Set size for collision capsule
 	GetCapsuleComponent()->InitCapsuleSize(55.f, 96.0f);
 		
-	
+	//bUseControllerRotationPitch = true;
 
 	Mesh1P = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("CharacterMesh1P"));
 	Mesh1P->SetOnlyOwnerSee(true);
@@ -66,14 +65,13 @@ AHelloCharacter::AHelloCharacter()
 	SpringArmComp->SetupAttachment(RootComponent);
 	SpringArmComp->TargetArmLength = 10.0f;
 	SpringArmComp->AddRelativeLocation(FVector(0.0f, 0.0f, 20.0f));
+	SpringArmComp->bUsePawnControlRotation = true;
 	
 	CameraComp = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
 	check(CameraComp);
 	CameraComp->SetupAttachment(SpringArmComp, USpringArmComponent::SocketName);
 	CameraComp->AddRelativeRotation(FQuat(FRotator(-5.0f, 0.0f, 0.0f)));
 	//CameraComp->FieldOfView = 90.0f;
-	//CameraComp->bUsePawnControlRotation = true; // Pawn의 회전값을 사용하도록 설정
-	// Create a CameraComponent
 	
 	// init variables
 	MovementSpeed = 10.0f;
@@ -81,71 +79,11 @@ AHelloCharacter::AHelloCharacter()
 
 	// init input
 	AutoPossessPlayer = EAutoReceiveInput::Player0;
-	//InputComponent->BindAction("MoveR", IE_Pressed, this, &AHelloCharacter::MoveR);
-	//InputComponent->BindAction("MoveL", IE_Pressed, this, &AHelloCharacter::MoveL);
-
-	// init target point
-	//m_arrTargetPointPtr.Add(nullptr);
 
 	// init capsule
 	GetCapsuleComponent()->OnComponentBeginOverlap.AddDynamic(this, &AHelloCharacter::MyOnComponentOverlap);
 	GetCapsuleComponent()->OnComponentEndOverlap.AddDynamic(this, &AHelloCharacter::MyOnComponentEndOverlap);
 }
-
-void AHelloCharacter::LookRight(float Value)
-{
-	if (Value != 0.0f)
-	{
-		FRotator NewRotation = SpringArmComp->GetRelativeRotation();
-		NewRotation.Yaw += Value * RotationSpeed * GetWorld()->GetDeltaSeconds();
-		SpringArmComp->SetRelativeRotation(NewRotation); // SpringArm의 회전값을 설정
-	}
-}
-
-void AHelloCharacter::LookUpper(float Value)
-{
-	if (Value != 0.0f)
-	{
-		FRotator NewRotation = SpringArmComp->GetRelativeRotation(); // SpringArm의 회전값을 가져옴
-		NewRotation.Pitch += Value * RotationSpeed * GetWorld()->GetDeltaSeconds();
-		NewRotation.Pitch = FMath::Clamp(NewRotation.Pitch, MinPitchAngle, MaxPitchAngle); // 각도 제한
-		SpringArmComp->SetRelativeRotation(NewRotation); // SpringArm의 회전값을 설정
-	}
-}
-
-void AHelloCharacter::MoveForward(float Value)
-{	
-	if (Controller && Value != 0.0f)
-	{
-		// 캐릭터의 정면 방향으로 이동
-		const FRotator Rotation = Controller->GetControlRotation();
-		const FRotator YawRotation(0, Rotation.Yaw, 0);
-
-		const FVector Direction = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
-		AddMovementInput(Direction, Value);
-	}
-}
-
-void AHelloCharacter::MoveRight(float Value)
-{
-	if (Controller && Value != 0.0f)
-	{
-		// 캐릭터의 오른쪽 방향으로 이동
-		const FRotator Rotation = Controller->GetControlRotation();
-		const FRotator YawRotation(0, Rotation.Yaw, 0);
-
-		const FVector Direction = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
-		AddMovementInput(Direction, Value);
-	}
-}
-void AHelloCharacter::RotateRight(float Value)
-{
-	if (Value != 0.0f)
-	{
-		AddControllerYawInput(Value * RotationSpeed * GetWorld()->GetDeltaSeconds());
-	}	
-}
-
 
 void AHelloCharacter::MyOnComponentOverlap(UPrimitiveComponent* pOverlappedComponent, AActor* pOtherActor,
 	UPrimitiveComponent* pOtherComp, int32 nOtherBodyIndex, bool bFromSweep, const FHitResult& Hit)
@@ -162,8 +100,11 @@ void AHelloCharacter::Move(const FInputActionValue& Value)
 	FVector2D MovementVector = Value.Get<FVector2D>();
 	if (Controller != nullptr)
 	{
-		AddMovementInput(GetActorForwardVector(), MovementVector.Y);
-		AddMovementInput(GetActorRightVector(), MovementVector.X);
+		// 프레임속도에 따른 보정 + 대각선 속도보정
+		const float DeltaTime = GetWorld()->GetDeltaSeconds();
+		const float DiagonalFactor = (FMath::Abs(MovementVector.X) > 0 && FMath::Abs(MovementVector.Y) > 0) ? 0.707f : 1.0f;
+		AddMovementInput(GetActorForwardVector(), MovementVector.Y * DeltaTime * InputKeyboardMoveSpeed * DiagonalFactor);
+		AddMovementInput(GetActorRightVector(), MovementVector.X * DeltaTime * InputKeyboardMoveSpeed * DiagonalFactor);
 	}
 }
 
@@ -172,8 +113,10 @@ void AHelloCharacter::Look(const FInputActionValue& Value)
 	FVector2D LookAxisVector = Value.Get<FVector2D>();
 	if (Controller != nullptr)
 	{
-		AddControllerYawInput(LookAxisVector.X);
-		AddControllerPitchInput(LookAxisVector.Y);
+		// 프레임속도에 따른 보정
+		const float DeltaTime = GetWorld()->GetDeltaSeconds();        
+		AddControllerYawInput(LookAxisVector.X * DeltaTime * InputMouseTurnSpeed);
+		AddControllerPitchInput(LookAxisVector.Y * DeltaTime * InputMouseTurnSpeed);
 	}
 }
 
@@ -206,6 +149,7 @@ void AHelloCharacter::BeginPlay()
 void AHelloCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
 }
 
 // Called to bind functionality to input
@@ -224,16 +168,6 @@ void AHelloCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 	else
 	{
 		UE_LOG(LogHelloCharacter, Error, TEXT("'%s' Failed to find an Enhanced Input Component! This template is built to use the Enhanced Input system. If you intend to use the legacy system, then you will need to update this C++ file."), *GetNameSafe(this));
-	}
-
-	// old
-	InputComponent->BindAction("Jump", IE_Pressed, this, &ACharacter::Jump);
-	InputComponent->BindAction("Jump", IE_Released, this, &ACharacter::StopJumping);
-	InputComponent->BindAxis("MoveForward", this, &AHelloCharacter::MoveForward);
-	InputComponent->BindAxis("MoveRight", this, &AHelloCharacter::MoveRight);
-	InputComponent->BindAxis("RotateRight", this, &AHelloCharacter::RotateRight);	
-	PlayerInputComponent->BindAxis("LookRight", this, &AHelloCharacter::LookRight);
-	PlayerInputComponent->BindAxis("LookUpper", this, &AHelloCharacter::LookUpper);
-	
+	}	
 }
 

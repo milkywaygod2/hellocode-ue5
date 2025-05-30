@@ -53,6 +53,10 @@ private:
 	float InputMouseTurnSpeed;
 	float InputKeyboardMoveSpeed;
 
+	void InitArrow();
+	void InitMesh();
+	void InitCamera();
+
 protected:
 	// move
 	void Move(const FInputActionValue& Value);

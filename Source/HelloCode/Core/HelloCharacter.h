@@ -21,14 +21,10 @@ UCLASS(Config=Game)
 class HELLOCODE_API AHelloCharacter : public ACharacter
 {
 	GENERATED_BODY()
-public:	
+public:
 	AHelloCharacter();
 
 private:
-	// mesh
-	UPROPERTY(VisibleDefaultsOnly, Category = Mesh)
-	USkeletalMeshComponent* Mesh1P;
-	
 	// camera
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	USpringArmComponent* SpringArmComp;
@@ -53,8 +49,9 @@ private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Weapon, meta = (AllowPrivateAccess = "true"))
 	bool bHasWeapon;
 
-	float InputMouseTurnSpeed{10.f};
-	float InputKeyboardMoveSpeed{30.f};
+	// param
+	float InputMouseTurnSpeed;
+	float InputKeyboardMoveSpeed;
 
 protected:
 	// move
@@ -70,12 +67,8 @@ public:
 	UFUNCTION(BlueprintCallable, Category = Weapon) void SetHasWeapon(const bool bNewHasWeapon) { bHasWeapon = bNewHasWeapon; }
 	UFUNCTION(BlueprintCallable, Category = Weapon) bool GetHasWeapon() const { return bHasWeapon; }
 
-	USkeletalMeshComponent* GetCharacterMesh() const { return Mesh1P; }
 	UCameraComponent* GetFirstPersonCameraComponent() const { return CameraComp; }
 	
-	UPROPERTY(EditAnywhere, Category = Logic) float MovementSpeed;
-	UPROPERTY(EditAnywhere, Category = Logic) float RotationSpeed;
-
 	UFUNCTION() void MyOnComponentOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& Hit);
 	UFUNCTION() void MyOnComponentEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 	

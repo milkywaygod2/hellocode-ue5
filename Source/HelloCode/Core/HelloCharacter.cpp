@@ -13,11 +13,21 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "InputActionValue.h"
+#include "Components/ArrowComponent.h"
 #include "Engine/LocalPlayer.h"
 
 #include "PhysicsEngine/PhysicsAsset.h"
 
 DEFINE_LOG_CATEGORY(LogHelloCharacter);
+
+void AHelloCharacter::UseForwardArrow()
+{
+	UArrowComponent* ForwardArrow = CreateDefaultSubobject<UArrowComponent>(TEXT("ForwardArrow"));
+	ForwardArrow->SetupAttachment(RootComponent);
+	ForwardArrow->ArrowSize = 1.0f;
+	ForwardArrow->SetRelativeLocation(FVector(50.0f, 0.0f, -GetCapsuleComponent()->GetScaledCapsuleHalfHeight()));
+	ForwardArrow->bHiddenInGame = false; // 인게임에서 표시
+}
 
 // Sets default values
 AHelloCharacter::AHelloCharacter()
@@ -25,13 +35,12 @@ AHelloCharacter::AHelloCharacter()
 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
+	// init variables
 	bHasWeapon = false;
-	
-	// Set size for collision capsule
-	GetCapsuleComponent()->InitCapsuleSize(55.f, 96.0f);
-		
-	//bUseControllerRotationPitch = true;
 
+	
+	UseForwardArrow();
+		
 	Mesh1P = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("CharacterMesh1P"));
 	Mesh1P->SetOnlyOwnerSee(true);
 	Mesh1P->SetupAttachment(CameraComp);
@@ -72,10 +81,6 @@ AHelloCharacter::AHelloCharacter()
 	CameraComp->SetupAttachment(SpringArmComp, USpringArmComponent::SocketName);
 	CameraComp->AddRelativeRotation(FQuat(FRotator(-5.0f, 0.0f, 0.0f)));
 	//CameraComp->FieldOfView = 90.0f;
-	
-	// init variables
-	MovementSpeed = 10.0f;
-	RotationSpeed = 20.0f;
 
 	// init input
 	AutoPossessPlayer = EAutoReceiveInput::Player0;

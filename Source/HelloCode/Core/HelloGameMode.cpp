@@ -15,6 +15,9 @@ void AHelloGameMode::BeginPlay()
 {
 	Super::BeginPlay();
 
+	// 화면 디버거
+	if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 55.0f, FColor::Yellow, FString::Printf(TEXT("======================== : %s"), *FDateTime::Now().ToString()));
+	
 	// 1 정석
 	const FString ClassName1 = FString::Printf(TEXT("%s BeginPlay, until %d!"), *FString("HelloGameModeEcho1"), 2040);
 	UE_LOG(LogTemp, Warning, TEXT("%s"), *ClassName1);
@@ -33,5 +36,6 @@ void AHelloGameMode::BeginPlay()
 	Args.Add(FStringFormatArg(Year));
 	const FString FormattedString = FString::Format(TEXT("{0} {1} {2}!"), Args); // 타입추론
 	UE_LOG(LogTemp, Warning, TEXT("%s"), *FormattedString);
-	
+
+
 }

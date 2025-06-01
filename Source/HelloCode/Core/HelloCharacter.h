@@ -52,6 +52,11 @@ private:
 	// param
 	float InputMouseTurnSpeed;
 	float InputKeyboardMoveSpeed;
+	float InputSpringArmPitchMin;
+	float InputSpringArmPitchMax;
+	float InputSpringArmYawMin;
+	float InputSpringArmYawMax;
+	float ControllerTurnSpeed;
 
 	void InitArrow();
 	void InitMesh();

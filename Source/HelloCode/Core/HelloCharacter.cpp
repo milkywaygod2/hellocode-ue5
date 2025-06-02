@@ -119,22 +119,22 @@ void AHelloCharacter::Move(const FInputActionValue& Value)
 	{
 		const float DeltaTime(GetWorld()->GetDeltaSeconds());
 		const FRotator OldControllerRot(GetControlRotation());
-		const FRotator RelativeSpringArmRot(SpringArmComp->GetRelativeRotation());
-		
-		FRotator ControllerAdjustedRot = FRotator(
-			FMath::Clamp(RelativeSpringArmRot.Pitch * DeltaTime, -ControllerTurnSpeed, ControllerTurnSpeed),
-			FMath::Clamp(RelativeSpringArmRot.Yaw * DeltaTime, -ControllerTurnSpeed, ControllerTurnSpeed),
-			FMath::Clamp(RelativeSpringArmRot.Roll * DeltaTime, -ControllerTurnSpeed, ControllerTurnSpeed)
-		);
+		const FRotator OldRelativeSpringArmRot(SpringArmComp->GetRelativeRotation());
+
+		const FRotator ControllerAdjustedRot(FRotator(
+			FMath::Clamp(OldRelativeSpringArmRot.Pitch * DeltaTime, -ControllerTurnSpeed, ControllerTurnSpeed),
+			FMath::Clamp(OldRelativeSpringArmRot.Yaw * DeltaTime, -ControllerTurnSpeed, ControllerTurnSpeed),
+			FMath::Clamp(OldRelativeSpringArmRot.Roll * DeltaTime, -ControllerTurnSpeed, ControllerTurnSpeed)
+		));
 		Controller->SetControlRotation(FRotator(
 			OldControllerRot.Pitch + ControllerAdjustedRot.Pitch,
 			OldControllerRot.Yaw + ControllerAdjustedRot.Yaw,
 			OldControllerRot.Roll + ControllerAdjustedRot.Roll
 		));
 		SpringArmComp->SetRelativeRotation(FRotator(
-			RelativeSpringArmRot.Pitch - ControllerAdjustedRot.Pitch,
-			RelativeSpringArmRot.Yaw - ControllerAdjustedRot.Yaw,
-			RelativeSpringArmRot.Roll - ControllerAdjustedRot.Roll
+			OldRelativeSpringArmRot.Pitch - ControllerAdjustedRot.Pitch,
+			OldRelativeSpringArmRot.Yaw - ControllerAdjustedRot.Yaw,
+			OldRelativeSpringArmRot.Roll - ControllerAdjustedRot.Roll
 		));
 		
 		const FVector2D MovementVector = Value.Get<FVector2D>();
@@ -146,20 +146,19 @@ void AHelloCharacter::Move(const FInputActionValue& Value)
 
 void AHelloCharacter::Look(const FInputActionValue& Value)
 {
-	const FVector2D LookAxisVector = Value.Get<FVector2D>();
 	if (Controller != nullptr)
 	{
 		const float DeltaTime(GetWorld()->GetDeltaSeconds());
-		const FRotator ControllerRot(GetControlRotation());
-		const FRotator NewSpringArmRot = FRotator(
-			 FMath::Clamp(SpringArmComp->GetComponentRotation().Pitch + LookAxisVector.Y * DeltaTime * InputMouseTurnSpeed,
+		const FVector2D LookAxisVector = Value.Get<FVector2D>();
+		const FRotator NewRelativeSpringArmRot = FRotator(
+			 FMath::Clamp(SpringArmComp->GetRelativeRotation().Pitch + LookAxisVector.Y * DeltaTime * InputMouseTurnSpeed,
 				InputSpringArmPitchMin,
 				InputSpringArmPitchMax),
-			ControllerRot.Yaw + FMath::Clamp(SpringArmComp->GetRelativeRotation().Yaw + LookAxisVector.X * DeltaTime * InputMouseTurnSpeed,
+			FMath::Clamp(SpringArmComp->GetRelativeRotation().Yaw + LookAxisVector.X * DeltaTime * InputMouseTurnSpeed,
 				InputSpringArmYawMin,
 				InputSpringArmYawMax),0.0f
 		);
-		SpringArmComp->SetWorldRotation(NewSpringArmRot);
+		SpringArmComp->SetRelativeRotation(NewRelativeSpringArmRot);
 		
 		//TODO: 천천히 움직일때는 카메라(머리), 빨리움직일떄는 스프링암(목) -> 카메라순으로
 		//TODO: 머리 목 회전 최대제한

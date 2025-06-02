@@ -119,33 +119,22 @@ void AHelloCharacter::Move(const FInputActionValue& Value)
 	{
 		const float DeltaTime(GetWorld()->GetDeltaSeconds());
 		const FRotator OldControllerRot(GetControlRotation());
-		const FRotator OldSpringArmRot(SpringArmComp->GetComponentRotation());
-		FRotator RotDiff = OldSpringArmRot - OldControllerRot;
-
-		// Controller->SetControlRotation(OldSpringArmRot);
-		//
-		// const FRotator NewControllerRot = GetControlRotation();
-		// const FRotator NewSpringArmRot = FRotator(
-		// 	OldSpringArmRot.Pitch,
-		// 	FRotator::NormalizeAxis(NewControllerRot.Yaw - RotDiff.Yaw),
-		// 	FRotator::NormalizeAxis(NewControllerRot.Roll - RotDiff.Roll)
-		// );
-		// SpringArmComp->SetWorldRotation(NewSpringArmRot);
+		const FRotator RelativeSpringArmRot(SpringArmComp->GetRelativeRotation());
 		
 		FRotator ControllerAdjustedRot = FRotator(
-			FMath::Clamp(RotDiff.Pitch * DeltaTime, -ControllerTurnSpeed, ControllerTurnSpeed),
-			FMath::Clamp(RotDiff.Yaw * DeltaTime, -ControllerTurnSpeed, ControllerTurnSpeed),
-			FMath::Clamp(RotDiff.Roll * DeltaTime, -ControllerTurnSpeed, ControllerTurnSpeed)
+			FMath::Clamp(RelativeSpringArmRot.Pitch * DeltaTime, -ControllerTurnSpeed, ControllerTurnSpeed),
+			FMath::Clamp(RelativeSpringArmRot.Yaw * DeltaTime, -ControllerTurnSpeed, ControllerTurnSpeed),
+			FMath::Clamp(RelativeSpringArmRot.Roll * DeltaTime, -ControllerTurnSpeed, ControllerTurnSpeed)
 		);
 		Controller->SetControlRotation(FRotator(
 			OldControllerRot.Pitch + ControllerAdjustedRot.Pitch,
 			OldControllerRot.Yaw + ControllerAdjustedRot.Yaw,
 			OldControllerRot.Roll + ControllerAdjustedRot.Roll
 		));
-		SpringArmComp->SetWorldRotation(FRotator(
-			OldSpringArmRot.Pitch - ControllerAdjustedRot.Pitch,
-			OldSpringArmRot.Yaw - ControllerAdjustedRot.Yaw,
-			OldSpringArmRot.Roll - ControllerAdjustedRot.Roll
+		SpringArmComp->SetRelativeRotation(FRotator(
+			RelativeSpringArmRot.Pitch - ControllerAdjustedRot.Pitch,
+			RelativeSpringArmRot.Yaw - ControllerAdjustedRot.Yaw,
+			RelativeSpringArmRot.Roll - ControllerAdjustedRot.Roll
 		));
 		
 		const FVector2D MovementVector = Value.Get<FVector2D>();
@@ -162,14 +151,13 @@ void AHelloCharacter::Look(const FInputActionValue& Value)
 	{
 		const float DeltaTime(GetWorld()->GetDeltaSeconds());
 		const FRotator ControllerRot(GetControlRotation());
-		const FRotator OldSpringArmRot = SpringArmComp->GetComponentRotation();
 		const FRotator NewSpringArmRot = FRotator(
-			FMath::Clamp(OldSpringArmRot.Pitch + LookAxisVector.Y * DeltaTime * InputMouseTurnSpeed,
+			 FMath::Clamp(SpringArmComp->GetComponentRotation().Pitch + LookAxisVector.Y * DeltaTime * InputMouseTurnSpeed,
 				InputSpringArmPitchMin,
 				InputSpringArmPitchMax),
-			FMath::Clamp(OldSpringArmRot.Yaw + LookAxisVector.X * DeltaTime * InputMouseTurnSpeed,
-				ControllerRot.Yaw + InputSpringArmYawMin,
-				ControllerRot.Yaw + InputSpringArmYawMax),0.0f
+			ControllerRot.Yaw + FMath::Clamp(SpringArmComp->GetRelativeRotation().Yaw + LookAxisVector.X * DeltaTime * InputMouseTurnSpeed,
+				InputSpringArmYawMin,
+				InputSpringArmYawMax),0.0f
 		);
 		SpringArmComp->SetWorldRotation(NewSpringArmRot);
 		

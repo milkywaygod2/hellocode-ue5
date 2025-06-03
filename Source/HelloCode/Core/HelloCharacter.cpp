@@ -77,6 +77,7 @@ void AHelloCharacter::InitCamera()
 	CameraComp->AddRelativeRotation(FQuat(FRotator(0.0f, 0.0f, 0.0f)));
 	//CameraComp->FieldOfView = 90.0f;
 	//DrawDebugLine(GetWorld(), SpringArmComp->GetComponentLocation(), CameraComp->GetComponentLocation(), FColor::Blue, true, -1, 0, 2.0f);
+
 }
 
 // Sets default values
@@ -94,7 +95,7 @@ AHelloCharacter::AHelloCharacter()
 	InputCameraPitchMin = -75.0f;
 	InputCameraPitchMax = 75.0f; 
 	InputCameraYawMinMax = 55.0f;
-	SpringArmLength = 50.0f; // 스프링암 길이
+	SpringArmLength = 50.0f;
 	InputSpringArmPitchMin = -45.0f;
 	InputSpringArmPitchMax = 30.0f;
 	InputSpringArmYawMinMax =  30.0f;
@@ -167,6 +168,7 @@ void AHelloCharacter::Look(const FInputActionValue& Value)
 		CameraComp->SetRelativeRotation(NewRelativeCameraRot);
 		if (FMath::Abs(NewRelativeCameraRot.Yaw) >= InputCameraYawMinMax) Move(FInputActionValue(FVector2D(0.0f, 0.0f)));
 		
+		//TODO: 일정시간후 정면보기
 		//TODO: 목 피치를 항시 약간 들고 있기
 		//TODO: 경계 속도 부드럽게
 	}

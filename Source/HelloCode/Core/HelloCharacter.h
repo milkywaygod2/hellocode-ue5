@@ -58,6 +58,7 @@ private:
 	float InputCameraPitchMin;
 	float InputCameraPitchMax;
 	float InputCameraYawMinMax;
+	float NoInputCameraTime;
 	float SpringArmLength;
 	float InputSpringArmPitchMin;
 	float InputSpringArmPitchMax;
@@ -81,6 +82,7 @@ protected:
 	virtual void BeginPlay() override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	virtual void Tick(float DeltaTime) override;
+	void TickHead(float DeltaTime);
 	void TickNeck(const bool Value);
 
 public:

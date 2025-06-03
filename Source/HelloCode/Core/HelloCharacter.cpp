@@ -95,6 +95,7 @@ AHelloCharacter::AHelloCharacter()
 	InputCameraPitchMin = -75.0f;
 	InputCameraPitchMax = 75.0f; 
 	InputCameraYawMinMax = 55.0f;
+	NoInputCameraTime = 0.0f;
 	SpringArmLength = 50.0f;
 	InputSpringArmPitchMin = -45.0f;
 	InputSpringArmPitchMax = 30.0f;
@@ -152,8 +153,9 @@ void AHelloCharacter::Move(const FInputActionValue& Value)
 
 void AHelloCharacter::Look(const FInputActionValue& Value)
 {
-	if (Controller != nullptr)
+	if (Controller)
 	{
+		NoInputCameraTime = 0.0f;
 		const float DeltaTime(GetWorld()->GetDeltaSeconds());
 		const FVector2D LookAxisVector = Value.Get<FVector2D>();
 		const FRotator OldRelativeCameraRot(CameraComp->GetRelativeRotation());
@@ -168,7 +170,6 @@ void AHelloCharacter::Look(const FInputActionValue& Value)
 		CameraComp->SetRelativeRotation(NewRelativeCameraRot);
 		if (FMath::Abs(NewRelativeCameraRot.Yaw) >= InputCameraYawMinMax) Move(FInputActionValue(FVector2D(0.0f, 0.0f)));
 		
-		//TODO: 일정시간후 정면보기
 		//TODO: 목 피치를 항시 약간 들고 있기
 		//TODO: 경계 속도 부드럽게
 	}
@@ -228,12 +229,31 @@ void AHelloCharacter::TickNeck(const bool Value)
 	}
 }
 
+void AHelloCharacter::TickHead(float DeltaTime)
+{
+	NoInputCameraTime += DeltaTime;
+
+	if (NoInputCameraTime >= 5.0f)
+	{
+		const FRotator OldCameraRot(CameraComp->GetRelativeRotation() + SpringArmComp->GetRelativeRotation());
+		const FRotator DiffRotClamp = FRotator(
+			 FMath::Clamp(OldCameraRot.Pitch,
+				-SpringArmTurnSpeed,
+				SpringArmTurnSpeed) * DeltaTime,
+			FMath::Clamp(OldCameraRot.Yaw,
+				-SpringArmTurnSpeed,
+				SpringArmTurnSpeed) * DeltaTime, 0.0f
+		);
+		CameraComp->SetRelativeRotation(CameraComp->GetRelativeRotation() - DiffRotClamp);
+	}
+}
+
 // Called when the game starts or when spawned
 void AHelloCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
-	if (APlayerController* PlayerController = Cast<APlayerController>(Controller))
+	if (const APlayerController* PlayerController = Cast<APlayerController>(Controller))
 	{
 		if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
 		{
@@ -254,9 +274,10 @@ void AHelloCharacter::BeginPlay()
 }
 
 // Called every frame
-void AHelloCharacter::Tick(float DeltaTime)
+void AHelloCharacter::Tick(const float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+	TickHead(DeltaTime);
 	TickNeck(bIsFixedNeck);
 }
 

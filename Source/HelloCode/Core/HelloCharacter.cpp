@@ -80,31 +80,39 @@ void AHelloCharacter::InitCamera()
 
 }
 
+void AHelloCharacter::InitParams()
+{
+	// TODO: 파람 모델화
+	bHasWeapon = false;
+	GetCharacterMovement()->JumpZVelocity = 1450.0f;
+	GetCharacterMovement()->GravityScale = 4.5f;
+	
+	InputMouseTurnSpeed = 50.0f; // 마우스 회전 속도
+	InputKeyboardMoveSpeed = 30.0f; // 키보드 이동 속도
+	
+	InputCameraPitchMin = -75.0f;
+	InputCameraPitchMax = 75.0f; 
+	InputCameraYawMinMax = 55.0f;
+	NoInputCameraTime = 0.0f;
+	
+	SpringArmLength = 50.0f;
+	InputSpringArmPitchMin = -45.0f;
+	InputSpringArmPitchMax = 30.0f;
+	InputSpringArmYawMinMax =  30.0f;
+	bIsFixedNeck = false;
+	
+	SpringArmTurnSpeed = 20.0f;
+	ControllerTurnSpeed = 10.0f;
+}
+
 // Sets default values
 AHelloCharacter::AHelloCharacter()
 {
 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
-	// init param
-	bHasWeapon = false;
-	GetCharacterMovement()->JumpZVelocity = 1450.0f;
-	GetCharacterMovement()->GravityScale = 4.5f;
-	InputMouseTurnSpeed = 50.0f; // 마우스 회전 속도
-	InputKeyboardMoveSpeed = 30.0f; // 키보드 이동 속도
-	InputCameraPitchMin = -75.0f;
-	InputCameraPitchMax = 75.0f; 
-	InputCameraYawMinMax = 55.0f;
-	NoInputCameraTime = 0.0f;
-	SpringArmLength = 50.0f;
-	InputSpringArmPitchMin = -45.0f;
-	InputSpringArmPitchMax = 30.0f;
-	InputSpringArmYawMinMax =  30.0f;
-	SpringArmTurnSpeed = 20.0f;
-	ControllerTurnSpeed = 10.0f;
-	bIsFixedNeck = false;
+	InitParams();
 	
-	// init component
 	InitArrow();
 	InitMesh();
 	InitCamera();
@@ -171,7 +179,7 @@ void AHelloCharacter::Look(const FInputActionValue& Value)
 		if (FMath::Abs(NewRelativeCameraRot.Yaw) >= InputCameraYawMinMax) Move(FInputActionValue(FVector2D(0.0f, 0.0f)));
 		
 		//TODO: 목 피치를 항시 약간 들고 있기
-		//TODO: 경계 속도 부드럽게
+		//TODO: 경계 속도 부드럽게 FMath::RInterpTo -> 반복적인 델타에의 적용에는 성능이슈있음
 	}
 }
 

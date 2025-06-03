@@ -67,6 +67,7 @@ private:
 	float ControllerTurnSpeed;
 	bool bIsFixedNeck;
 
+	void InitParams();
 	void InitArrow();
 	void InitMesh();
 	void InitCamera();

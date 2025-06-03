@@ -165,8 +165,8 @@ void AHelloCharacter::Look(const FInputActionValue& Value)
 				InputCameraYawMinMax), 0.0f
 		);
 		CameraComp->SetRelativeRotation(NewRelativeCameraRot);
+		if (FMath::Abs(NewRelativeCameraRot.Yaw) >= InputCameraYawMinMax) Move(FInputActionValue(FVector2D(0.0f, 0.0f)));
 		
-		//TODO: 머리최대로 돌리면 자동회전
 		//TODO: 목 피치를 항시 약간 들고 있기
 		//TODO: 경계 속도 부드럽게
 	}
@@ -174,58 +174,55 @@ void AHelloCharacter::Look(const FInputActionValue& Value)
 
 void AHelloCharacter::TickNeck(const bool Value)
 {
-	if (!Value)
-	{
-		if (Controller)
+	if (!Value && Controller)
+	{		
+		const float DeltaTime(GetWorld()->GetDeltaSeconds());
+		const FRotator OldControllerRot(GetControlRotation());
+		const FRotator OldRelativeSpringArmRot(SpringArmComp->GetRelativeRotation());
+		const FRotator OldRelativeCameraRot(CameraComp->GetRelativeRotation());
+
+		const FRotator SpringArmAdjustedRot(FRotator(
+			FMath::Clamp(OldRelativeCameraRot.Pitch * DeltaTime, -SpringArmTurnSpeed, SpringArmTurnSpeed),
+			FMath::Clamp(OldRelativeCameraRot.Yaw * DeltaTime, -SpringArmTurnSpeed, SpringArmTurnSpeed),
+			0.0f
+		));
+
+		float NewSpringArmPitch, NewCameraPitch;
+		if (OldRelativeSpringArmRot.Pitch + SpringArmAdjustedRot.Pitch > InputSpringArmPitchMax)
 		{
-			const float DeltaTime(GetWorld()->GetDeltaSeconds());
-			const FRotator OldControllerRot(GetControlRotation());
-			const FRotator OldRelativeSpringArmRot(SpringArmComp->GetRelativeRotation());
-			const FRotator OldRelativeCameraRot(CameraComp->GetRelativeRotation());
-
-			const FRotator SpringArmAdjustedRot(FRotator(
-				FMath::Clamp(OldRelativeCameraRot.Pitch * DeltaTime, -SpringArmTurnSpeed, SpringArmTurnSpeed),
-				FMath::Clamp(OldRelativeCameraRot.Yaw * DeltaTime, -SpringArmTurnSpeed, SpringArmTurnSpeed),
-				0.0f
-			));
-
-			float NewSpringArmPitch, NewCameraPitch;
-			if (OldRelativeSpringArmRot.Pitch + SpringArmAdjustedRot.Pitch > InputSpringArmPitchMax)
-			{
-				NewSpringArmPitch = InputSpringArmPitchMax;
-				NewCameraPitch = OldRelativeCameraRot.Pitch - (NewSpringArmPitch - OldRelativeSpringArmRot.Pitch);
-			}
-			else if (OldRelativeSpringArmRot.Pitch + SpringArmAdjustedRot.Pitch < InputSpringArmPitchMin)
-			{
-				NewSpringArmPitch = InputSpringArmPitchMin;
-				NewCameraPitch = OldRelativeCameraRot.Pitch - (NewSpringArmPitch - OldRelativeSpringArmRot.Pitch);
-			}
-			else
-			{
-				NewSpringArmPitch = OldRelativeSpringArmRot.Pitch + SpringArmAdjustedRot.Pitch;
-				NewCameraPitch = OldRelativeCameraRot.Pitch - SpringArmAdjustedRot.Pitch;
-			}
-
-			float NewSpringArmYaw, NewCameraYaw;
-			if (OldRelativeSpringArmRot.Yaw + SpringArmAdjustedRot.Yaw > InputSpringArmYawMinMax)
-			{
-				NewSpringArmYaw = InputSpringArmYawMinMax;
-				NewCameraYaw = OldRelativeCameraRot.Yaw - (NewSpringArmYaw - OldRelativeSpringArmRot.Yaw);
-			}
-			else if (OldRelativeSpringArmRot.Yaw + SpringArmAdjustedRot.Yaw < -InputSpringArmYawMinMax)
-			{
-				NewSpringArmYaw = -InputSpringArmYawMinMax;
-				NewCameraYaw = OldRelativeCameraRot.Yaw - (NewSpringArmYaw - OldRelativeSpringArmRot.Yaw);
-			}
-			else
-			{
-				NewSpringArmYaw = OldRelativeSpringArmRot.Yaw + SpringArmAdjustedRot.Yaw;
-				NewCameraYaw = OldRelativeCameraRot.Yaw - SpringArmAdjustedRot.Yaw;
-			}
-
-			SpringArmComp->SetRelativeRotation(FRotator(NewSpringArmPitch, NewSpringArmYaw, 0.0f));
-			CameraComp->SetRelativeRotation(FRotator(NewCameraPitch, NewCameraYaw, 0.0f));
+			NewSpringArmPitch = InputSpringArmPitchMax;
+			NewCameraPitch = OldRelativeCameraRot.Pitch - (NewSpringArmPitch - OldRelativeSpringArmRot.Pitch);
 		}
+		else if (OldRelativeSpringArmRot.Pitch + SpringArmAdjustedRot.Pitch < InputSpringArmPitchMin)
+		{
+			NewSpringArmPitch = InputSpringArmPitchMin;
+			NewCameraPitch = OldRelativeCameraRot.Pitch - (NewSpringArmPitch - OldRelativeSpringArmRot.Pitch);
+		}
+		else
+		{
+			NewSpringArmPitch = OldRelativeSpringArmRot.Pitch + SpringArmAdjustedRot.Pitch;
+			NewCameraPitch = OldRelativeCameraRot.Pitch - SpringArmAdjustedRot.Pitch;
+		}
+
+		float NewSpringArmYaw, NewCameraYaw;
+		if (OldRelativeSpringArmRot.Yaw + SpringArmAdjustedRot.Yaw > InputSpringArmYawMinMax)
+		{
+			NewSpringArmYaw = InputSpringArmYawMinMax;
+			NewCameraYaw = OldRelativeCameraRot.Yaw - (NewSpringArmYaw - OldRelativeSpringArmRot.Yaw);
+		}
+		else if (OldRelativeSpringArmRot.Yaw + SpringArmAdjustedRot.Yaw < -InputSpringArmYawMinMax)
+		{
+			NewSpringArmYaw = -InputSpringArmYawMinMax;
+			NewCameraYaw = OldRelativeCameraRot.Yaw - (NewSpringArmYaw - OldRelativeSpringArmRot.Yaw);
+		}
+		else
+		{
+			NewSpringArmYaw = OldRelativeSpringArmRot.Yaw + SpringArmAdjustedRot.Yaw;
+			NewCameraYaw = OldRelativeCameraRot.Yaw - SpringArmAdjustedRot.Yaw;
+		}
+
+		SpringArmComp->SetRelativeRotation(FRotator(NewSpringArmPitch, NewSpringArmYaw, 0.0f));
+		CameraComp->SetRelativeRotation(FRotator(NewCameraPitch, NewCameraYaw, 0.0f));
 	}
 }
 

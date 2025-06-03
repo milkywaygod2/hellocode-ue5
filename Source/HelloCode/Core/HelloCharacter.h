@@ -45,6 +45,9 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputAction* LookAction;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	UInputAction* FixNeckAction;
+
 	// info
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Weapon, meta = (AllowPrivateAccess = "true"))
 	bool bHasWeapon;
@@ -52,11 +55,15 @@ private:
 	// param
 	float InputMouseTurnSpeed;
 	float InputKeyboardMoveSpeed;
+	float InputCameraPitchMin;
+	float InputCameraPitchMax;
+	float InputCameraYawMinMax;
 	float InputSpringArmPitchMin;
 	float InputSpringArmPitchMax;
-	float InputSpringArmYawMin;
-	float InputSpringArmYawMax;
+	float InputSpringArmYawMinMax;
+	float SpringArmTurnSpeed;
 	float ControllerTurnSpeed;
+	bool bIsFixedNeck;
 
 	void InitArrow();
 	void InitMesh();
@@ -66,11 +73,14 @@ protected:
 	// move
 	void Move(const FInputActionValue& Value);
 	void Look(const FInputActionValue& Value);
+	void FixNeck(const FInputActionValue& Value) { bIsFixedNeck = true; }
+	void UnFixNeck(const FInputActionValue& Value) { bIsFixedNeck = false; }
 
 	// default
 	virtual void BeginPlay() override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	virtual void Tick(float DeltaTime) override;
+	void TickNeck(const bool Value);
 
 public:
 	UFUNCTION(BlueprintCallable, Category = Weapon) void SetHasWeapon(const bool bNewHasWeapon) { bHasWeapon = bNewHasWeapon; }

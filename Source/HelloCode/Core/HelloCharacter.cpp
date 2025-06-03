@@ -96,11 +96,15 @@ AHelloCharacter::AHelloCharacter()
 	GetCharacterMovement()->GravityScale = 4.5f;
 	InputMouseTurnSpeed = 50.0f; // 마우스 회전 속도
 	InputKeyboardMoveSpeed = 30.0f; // 키보드 이동 속도
-	InputSpringArmPitchMin = -75.0;
-	InputSpringArmPitchMax = 75.0; 
-	InputSpringArmYawMin = -45.0;  
-	InputSpringArmYawMax = 45.0;
+	InputCameraPitchMin = -75.0f;
+	InputCameraPitchMax = 75.0f; 
+	InputCameraYawMinMax = 55.0f;  
+	InputSpringArmPitchMin = -45.0f;
+	InputSpringArmPitchMax = 30.0f;
+	InputSpringArmYawMinMax =  30.0f;
+	SpringArmTurnSpeed = 20.0f;
 	ControllerTurnSpeed = 10.0f;
+	bIsFixedNeck = false;
 }
 
 void AHelloCharacter::MyOnComponentOverlap(UPrimitiveComponent* pOverlappedComponent, AActor* pOtherActor,
@@ -150,18 +154,76 @@ void AHelloCharacter::Look(const FInputActionValue& Value)
 	{
 		const float DeltaTime(GetWorld()->GetDeltaSeconds());
 		const FVector2D LookAxisVector = Value.Get<FVector2D>();
-		const FRotator NewRelativeSpringArmRot = FRotator(
-			 FMath::Clamp(SpringArmComp->GetRelativeRotation().Pitch + LookAxisVector.Y * DeltaTime * InputMouseTurnSpeed,
-				InputSpringArmPitchMin,
-				InputSpringArmPitchMax),
-			FMath::Clamp(SpringArmComp->GetRelativeRotation().Yaw + LookAxisVector.X * DeltaTime * InputMouseTurnSpeed,
-				InputSpringArmYawMin,
-				InputSpringArmYawMax),0.0f
+		const FRotator OldRelativeCameraRot(CameraComp->GetRelativeRotation());
+		const FRotator NewRelativeCameraRot = FRotator(
+			 FMath::Clamp(OldRelativeCameraRot.Pitch + LookAxisVector.Y * DeltaTime * InputMouseTurnSpeed,
+				InputCameraPitchMin,
+				InputCameraPitchMax),
+			FMath::Clamp(OldRelativeCameraRot.Yaw + LookAxisVector.X * DeltaTime * InputMouseTurnSpeed,
+				-InputCameraYawMinMax,
+				InputCameraYawMinMax), 0.0f
 		);
-		SpringArmComp->SetRelativeRotation(NewRelativeSpringArmRot);
+		CameraComp->SetRelativeRotation(NewRelativeCameraRot);
 		
 		//TODO: 천천히 움직일때는 카메라(머리), 빨리움직일떄는 스프링암(목) -> 카메라순으로
 		//TODO: 머리 목 회전 최대제한
+	}
+}
+
+void AHelloCharacter::TickNeck(const bool Value)
+{
+	if (!Value)
+	{
+		if (Controller)
+		{
+			const float DeltaTime(GetWorld()->GetDeltaSeconds());
+			const FRotator OldControllerRot(GetControlRotation());
+			const FRotator OldRelativeSpringArmRot(SpringArmComp->GetRelativeRotation());
+			const FRotator OldRelativeCameraRot(CameraComp->GetRelativeRotation());
+
+			const FRotator SpringArmAdjustedRot(FRotator(
+				FMath::Clamp(OldRelativeCameraRot.Pitch * DeltaTime, -SpringArmTurnSpeed, SpringArmTurnSpeed),
+				FMath::Clamp(OldRelativeCameraRot.Yaw * DeltaTime, -SpringArmTurnSpeed, SpringArmTurnSpeed),
+				0.0f
+			));
+
+			float NewSpringArmPitch, NewCameraPitch;
+			if (OldRelativeSpringArmRot.Pitch + SpringArmAdjustedRot.Pitch > InputSpringArmPitchMax)
+			{
+				NewSpringArmPitch = InputSpringArmPitchMax;
+				NewCameraPitch = OldRelativeCameraRot.Pitch - (NewSpringArmPitch - OldRelativeSpringArmRot.Pitch);
+			}
+			else if (OldRelativeSpringArmRot.Pitch + SpringArmAdjustedRot.Pitch < InputSpringArmPitchMin)
+			{
+				NewSpringArmPitch = InputSpringArmPitchMin;
+				NewCameraPitch = OldRelativeCameraRot.Pitch - (NewSpringArmPitch - OldRelativeSpringArmRot.Pitch);
+			}
+			else
+			{
+				NewSpringArmPitch = OldRelativeSpringArmRot.Pitch + SpringArmAdjustedRot.Pitch;
+				NewCameraPitch = OldRelativeCameraRot.Pitch - SpringArmAdjustedRot.Pitch;
+			}
+
+			float NewSpringArmYaw, NewCameraYaw;
+			if (OldRelativeSpringArmRot.Yaw + SpringArmAdjustedRot.Yaw > InputSpringArmYawMinMax)
+			{
+				NewSpringArmYaw = InputSpringArmYawMinMax;
+				NewCameraYaw = OldRelativeCameraRot.Yaw - (NewSpringArmYaw - OldRelativeSpringArmRot.Yaw);
+			}
+			else if (OldRelativeSpringArmRot.Yaw + SpringArmAdjustedRot.Yaw < -InputSpringArmYawMinMax)
+			{
+				NewSpringArmYaw = -InputSpringArmYawMinMax;
+				NewCameraYaw = OldRelativeCameraRot.Yaw - (NewSpringArmYaw - OldRelativeSpringArmRot.Yaw);
+			}
+			else
+			{
+				NewSpringArmYaw = OldRelativeSpringArmRot.Yaw + SpringArmAdjustedRot.Yaw;
+				NewCameraYaw = OldRelativeCameraRot.Yaw - SpringArmAdjustedRot.Yaw;
+			}
+
+			SpringArmComp->SetRelativeRotation(FRotator(NewSpringArmPitch, NewSpringArmYaw, 0.0f));
+			CameraComp->SetRelativeRotation(FRotator(NewCameraPitch, NewCameraYaw, 0.0f));
+		}
 	}
 }
 
@@ -194,7 +256,7 @@ void AHelloCharacter::BeginPlay()
 void AHelloCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
+	TickNeck(bIsFixedNeck);
 }
 
 // Called to bind functionality to input
@@ -209,6 +271,8 @@ void AHelloCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &ACharacter::StopJumping);
 		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &AHelloCharacter::Move);
 		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &AHelloCharacter::Look);
+		EnhancedInputComponent->BindAction(FixNeckAction, ETriggerEvent::Started, this, &AHelloCharacter::FixNeck);
+		EnhancedInputComponent->BindAction(FixNeckAction, ETriggerEvent::Completed, this, &AHelloCharacter::UnFixNeck);
 	}
 	else
 	{

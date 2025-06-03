@@ -60,7 +60,7 @@ void AHelloCharacter::InitCamera()
 	SpringArmComp = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArm"));
 	check(SpringArmComp);
 	SpringArmComp->SetupAttachment(RootComponent);
-	SpringArmComp->TargetArmLength = -50.0f; // -앞으로 뻗기, +뒤로 뻗기
+	SpringArmComp->TargetArmLength = -SpringArmLength; // -앞으로 뻗기, +뒤로 뻗기
 	SpringArmComp->AddRelativeLocation(FVector(0.f, 0.0f, 100.0f)); // 앞뒤, 좌우, 상하
 	SpringArmComp->bUsePawnControlRotation = false; // 카메라가 캐릭터의 회전을 따르지 않도록 설정
 	
@@ -85,11 +85,6 @@ AHelloCharacter::AHelloCharacter()
 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
-	// init component
-	InitArrow();
-	InitMesh();
-	InitCamera();
-
 	// init param
 	bHasWeapon = false;
 	GetCharacterMovement()->JumpZVelocity = 1450.0f;
@@ -98,13 +93,19 @@ AHelloCharacter::AHelloCharacter()
 	InputKeyboardMoveSpeed = 30.0f; // 키보드 이동 속도
 	InputCameraPitchMin = -75.0f;
 	InputCameraPitchMax = 75.0f; 
-	InputCameraYawMinMax = 55.0f;  
+	InputCameraYawMinMax = 55.0f;
+	SpringArmLength = 50.0f; // 스프링암 길이
 	InputSpringArmPitchMin = -45.0f;
 	InputSpringArmPitchMax = 30.0f;
 	InputSpringArmYawMinMax =  30.0f;
 	SpringArmTurnSpeed = 20.0f;
 	ControllerTurnSpeed = 10.0f;
 	bIsFixedNeck = false;
+	
+	// init component
+	InitArrow();
+	InitMesh();
+	InitCamera();
 }
 
 void AHelloCharacter::MyOnComponentOverlap(UPrimitiveComponent* pOverlappedComponent, AActor* pOtherActor,
@@ -165,8 +166,9 @@ void AHelloCharacter::Look(const FInputActionValue& Value)
 		);
 		CameraComp->SetRelativeRotation(NewRelativeCameraRot);
 		
-		//TODO: 천천히 움직일때는 카메라(머리), 빨리움직일떄는 스프링암(목) -> 카메라순으로
-		//TODO: 머리 목 회전 최대제한
+		//TODO: 머리최대로 돌리면 자동회전
+		//TODO: 목 피치를 항시 약간 들고 있기
+		//TODO: 경계 속도 부드럽게
 	}
 }
 

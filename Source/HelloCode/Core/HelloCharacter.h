@@ -58,6 +58,7 @@ private:
 	float InputCameraPitchMin;
 	float InputCameraPitchMax;
 	float InputCameraYawMinMax;
+	float SpringArmLength;
 	float InputSpringArmPitchMin;
 	float InputSpringArmPitchMax;
 	float InputSpringArmYawMinMax;

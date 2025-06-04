@@ -14,25 +14,25 @@ AHelloProjectile::AHelloProjectile()
 	PrimaryActorTick.bCanEverTick = true;
 
 	// Use a sphere as a simple collision representation
-	ProjectileCollisionComp = CreateDefaultSubobject<USphereComponent>(TEXT("SphereComp"));
-	ProjectileCollisionComp->InitSphereRadius(5.0f);
-	ProjectileCollisionComp->BodyInstance.SetCollisionProfileName("Projectile");
-	ProjectileCollisionComp->OnComponentHit.AddDynamic(this, &AHelloProjectile::OnHit);		// set up a notification for when this component hits something blocking
+	CollisionComp = CreateDefaultSubobject<USphereComponent>(TEXT("SphereComp"));
+	CollisionComp->InitSphereRadius(5.0f);
+	CollisionComp->BodyInstance.SetCollisionProfileName("Projectile");
+	CollisionComp->OnComponentHit.AddDynamic(this, &AHelloProjectile::OnHit);		// set up a notification for when this component hits something blocking
 
 	// Players can't walk on it
-	ProjectileCollisionComp->SetWalkableSlopeOverride(FWalkableSlopeOverride(WalkableSlope_Unwalkable, 0.f));
-	ProjectileCollisionComp->CanCharacterStepUpOn = ECB_No;
+	CollisionComp->SetWalkableSlopeOverride(FWalkableSlopeOverride(WalkableSlope_Unwalkable, 0.f));
+	CollisionComp->CanCharacterStepUpOn = ECB_No;
 
 	// Set as root component
-	RootComponent = ProjectileCollisionComp;
+	RootComponent = CollisionComp;
 
 	// Use a ProjectileMovementComponent to govern this projectile's movement
-	ProjectileMovementComp = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("ProjectileComp"));
-	ProjectileMovementComp->UpdatedComponent = ProjectileCollisionComp;
-	ProjectileMovementComp->InitialSpeed = 3000.f;
-	ProjectileMovementComp->MaxSpeed = 3000.f;
-	ProjectileMovementComp->bRotationFollowsVelocity = true;
-	ProjectileMovementComp->bShouldBounce = true;
+	MovementComp = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("ProjectileComp"));
+	MovementComp->UpdatedComponent = CollisionComp;
+	MovementComp->InitialSpeed = 3000.f;
+	MovementComp->MaxSpeed = 3000.f;
+	MovementComp->bRotationFollowsVelocity = true;
+	MovementComp->bShouldBounce = true;
 
 	// Die after 3 seconds by default
 	InitialLifeSpan = 3.0f;
@@ -45,7 +45,7 @@ void AHelloProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, U
 	{
 		OtherComp->AddImpulseAtLocation(GetVelocity() * 100.0f, GetActorLocation());
 
-		Destroy();
+		Destroy(); // SetLifeSpan(2.0f);
 	}
 }
 

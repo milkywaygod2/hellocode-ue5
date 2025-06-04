@@ -15,10 +15,10 @@ class HELLOCODE_API AHelloProjectile : public AActor
 	GENERATED_BODY()
 
 	UPROPERTY(VisibleDefaultsOnly, Category=Projectile)
-	USphereComponent* ProjectileCollisionComp;
+	USphereComponent* CollisionComp;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Movement, meta = (AllowPrivateAccess = "true"))
-	UProjectileMovementComponent* ProjectileMovementComp;
+	UProjectileMovementComponent* MovementComp;
 	
 public:
 	// Sets default values for this actor's properties
@@ -27,8 +27,8 @@ public:
 	UFUNCTION()
 	void OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
 
-	USphereComponent* GetCollisionComp() const { return ProjectileCollisionComp; }
-	UProjectileMovementComponent* GetProjectileMovement() const { return ProjectileMovementComp; }
+	USphereComponent* GetCollisionComp() const { return CollisionComp; }
+	UProjectileMovementComponent* GetProjectileMovement() const { return MovementComp; }
 	
 protected:
 	// Called when the game starts or when spawned

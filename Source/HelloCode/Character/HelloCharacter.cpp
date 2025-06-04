@@ -241,7 +241,7 @@ void AHelloCharacter::TickHead(float DeltaTime)
 {
 	NoInputCameraTime += DeltaTime;
 
-	if (NoInputCameraTime >= 5.0f)
+	if (NoInputCameraTime >= 3.0f)
 	{
 		const FRotator OldCameraRot(CameraComp->GetRelativeRotation() + SpringArmComp->GetRelativeRotation());
 		const FRotator DiffRotClamp = FRotator(

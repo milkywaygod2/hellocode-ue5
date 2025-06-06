@@ -47,17 +47,16 @@ public:
 	UShottedable();
 
 	/** Make the weapon Shot a Projectile */
-	UFUNCTION(BlueprintCallable, Category="Weapon")
+	UFUNCTION(BlueprintCallable, Category="Shot")
 	void Shot();
 
 	/** Attaches the actor to a FirstPersonCharacter */
-	UFUNCTION(BlueprintCallable, Category="Weapon")
+	UFUNCTION(BlueprintCallable, Category="Shot")
 	void AttachWeapon(AHelloCharacter* TargetCharacter);
 
 protected:
 	/** Ends gameplay for this component. */
-	UFUNCTION()
-	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
+	UFUNCTION() virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 
 private:
 	/** The Character holding this weapon*/

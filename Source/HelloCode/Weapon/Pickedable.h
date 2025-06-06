@@ -18,8 +18,8 @@ class HELLOCODE_API UPickedable : public UPrimitiveComponent
 	UPickedable();
 	explicit UPickedable(UPrimitiveComponent* InputMesh);
 
-	UPROPERTY(BlueprintAssignable, Category = "Interaction") FOnPickUp OnPickUp;
 public:	
+	UPROPERTY(BlueprintAssignable, Category = "Interaction") FOnPickUp OnPickUp;
 	void SetPickupMesh(UPrimitiveComponent* InputMesh);
 	UPrimitiveComponent* GetPickupMesh() const { return PickupCollision; }
 	

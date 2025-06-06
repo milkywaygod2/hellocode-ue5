@@ -4,19 +4,19 @@
 
 #include "CoreMinimal.h"
 #include "HelloCode/Pawn/HelloCharacter.h"
-#include "Pickable.generated.h"
+#include "Pickedable.generated.h"
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnPickUp, AHelloCharacter*, PickUpCharacter);
 
 UCLASS(Blueprintable, BlueprintType, ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
-class HELLOCODE_API UPickable : public UPrimitiveComponent
+class HELLOCODE_API UPickedable : public UPrimitiveComponent
 {
 	GENERATED_BODY()
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Pickup", meta = (AllowPrivateAccess = "true"))
 	UPrimitiveComponent* PickupCollision;
 
-	UPickable();
-	explicit UPickable(UPrimitiveComponent* InputMesh);
+	UPickedable();
+	explicit UPickedable(UPrimitiveComponent* InputMesh);
 
 	UPROPERTY(BlueprintAssignable, Category = "Interaction") FOnPickUp OnPickUp;
 public:	

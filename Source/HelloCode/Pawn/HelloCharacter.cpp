@@ -99,7 +99,9 @@ void AHelloCharacter::InitParams()
 	GetCharacterMovement()->GravityScale = 4.5f;
 	
 	InputMouseTurnSpeed = 50.0f; // 마우스 회전 속도
-	InputKeyboardMoveSpeed = 30.0f; // 키보드 이동 속도
+	InputKeyboardMoveSpeedForward = 30.0f;
+	InputKeyboardMoveSpeedBack = 7.0f;
+	InputKeyboardMoveSpeedSide = 12.0f;
 	
 	InputCameraPitchMin = -75.0f;
 	InputCameraPitchMax = 75.0f; 
@@ -110,10 +112,13 @@ void AHelloCharacter::InitParams()
 	InputSpringArmPitchMin = -45.0f;
 	InputSpringArmPitchMax = 30.0f;
 	InputSpringArmYawMinMax =  30.0f;
-	bIsFixedNeck = false;
 	
 	SpringArmTurnSpeed = 20.0f;
 	ControllerTurnSpeed = 10.0f;
+	
+	CachedMovementVector = FVector2D::ZeroVector;
+	CachedDiagonalFactor = 1.0f;
+	bIsFixedNeck = false;
 }
 
 // Sets default values
@@ -164,9 +169,16 @@ void AHelloCharacter::Move(const FInputActionValue& Value)
 		));
 		
 		const FVector2D MovementVector = Value.Get<FVector2D>();
-		const float DiagonalFactor = (FMath::Abs(MovementVector.X) > 0 && FMath::Abs(MovementVector.Y) > 0) ? 0.707f : 1.0f;
-		AddMovementInput(GetActorForwardVector(), MovementVector.Y * DeltaTime * InputKeyboardMoveSpeed * DiagonalFactor);
-		AddMovementInput(GetActorRightVector(), MovementVector.X * DeltaTime * InputKeyboardMoveSpeed * DiagonalFactor);
+		const float InputKeyboardMoveSpeedForwardOrBack = (MovementVector.Y >= 0) ? InputKeyboardMoveSpeedForward : InputKeyboardMoveSpeedBack;
+		if (MovementVector != CachedMovementVector)
+		{
+			CachedDiagonalFactor = (MovementVector.X != 0 && MovementVector.Y != 0)
+				? FMath::Sqrt((InputKeyboardMoveSpeedForwardOrBack * InputKeyboardMoveSpeedForwardOrBack + InputKeyboardMoveSpeedSide * InputKeyboardMoveSpeedSide)) / (InputKeyboardMoveSpeedForwardOrBack + InputKeyboardMoveSpeedSide) // 0 ~ 1 표현위한 나누기(면적)
+				: 1.0f;
+		}
+		
+		AddMovementInput(GetActorForwardVector(), MovementVector.Y * DeltaTime * InputKeyboardMoveSpeedForwardOrBack * CachedDiagonalFactor);
+		AddMovementInput(GetActorRightVector(), MovementVector.X * DeltaTime * InputKeyboardMoveSpeedSide * CachedDiagonalFactor);
 	}
 }
 

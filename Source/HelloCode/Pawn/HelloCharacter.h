@@ -59,7 +59,9 @@ private:
 
 	// param
 	float InputMouseTurnSpeed;
-	float InputKeyboardMoveSpeed;
+	float InputKeyboardMoveSpeedForward;
+	float InputKeyboardMoveSpeedBack;
+	float InputKeyboardMoveSpeedSide;
 	float InputCameraPitchMin;
 	float InputCameraPitchMax;
 	float InputCameraYawMinMax;
@@ -70,6 +72,9 @@ private:
 	float InputSpringArmYawMinMax;
 	float SpringArmTurnSpeed;
 	float ControllerTurnSpeed;
+
+	FVector2D CachedMovementVector;
+	float CachedDiagonalFactor;
 	bool bIsFixedNeck;
 
 	void InitParams();

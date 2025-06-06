@@ -25,6 +25,11 @@ public:
 	AHelloCharacter();
 
 private:
+	// mesh -> main mesh : GetMesh()
+	/** temp mesh: 1st person view (arms; seen only by self) */
+	UPROPERTY(VisibleDefaultsOnly, Category=Mesh)
+	USkeletalMeshComponent* Mesh1P;
+	
 	// camera
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	USpringArmComponent* SpringArmComp;
@@ -49,8 +54,8 @@ private:
 	UInputAction* FixNeckAction;
 
 	// info
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Weapon, meta = (AllowPrivateAccess = "true"))
-	bool bHasWeapon;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Equip, meta = (AllowPrivateAccess = "true"))
+	bool bEquipShotedable;
 
 	// param
 	float InputMouseTurnSpeed;
@@ -87,10 +92,11 @@ protected:
 	void TickNeck(const bool Value);
 
 public:
-	UFUNCTION(BlueprintCallable, Category = Weapon) void SetHasWeapon(const bool bNewHasWeapon) { bHasWeapon = bNewHasWeapon; }
-	UFUNCTION(BlueprintCallable, Category = Weapon) bool GetHasWeapon() const { return bHasWeapon; }
+	UFUNCTION(BlueprintCallable, Category = Equip) void SetEquipShotedable(const bool bNewEquipShotedable) { bEquipShotedable = bNewEquipShotedable; }
+	UFUNCTION(BlueprintCallable, Category = Equip) bool GetEquipShotedable() const { return bEquipShotedable; }
 
 	UCameraComponent* GetFirstPersonCameraComponent() const { return CameraComp; }
+	USkeletalMeshComponent* GetMesh1P() const { return Mesh1P; }
 	
 	UFUNCTION() void MyOnComponentOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& Hit);
 	UFUNCTION() void MyOnComponentEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);

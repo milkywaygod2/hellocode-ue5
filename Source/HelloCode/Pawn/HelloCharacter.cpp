@@ -53,6 +53,17 @@ void AHelloCharacter::InitMesh()
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Failed to load SkeletalMesh!"));
 	}
+
+	// Temp
+	// Create a mesh component that will be used when being viewed from a '1st person' view (when controlling this pawn)
+	// Mesh1P = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("CharacterMesh1P"));
+	// Mesh1P->SetOnlyOwnerSee(true);
+	// Mesh1P->SetupAttachment(FirstPersonCameraComponent);
+	// Mesh1P->bCastDynamicShadow = false;
+	// Mesh1P->CastShadow = false;
+	//
+	// //Mesh1P->SetRelativeRotation(FRotator(0.9f, -19.19f, 5.2f));
+	// Mesh1P->SetRelativeLocation(FVector(-30.f, 0.f, -150.f));
 }
 
 void AHelloCharacter::InitCamera()
@@ -83,7 +94,7 @@ void AHelloCharacter::InitCamera()
 void AHelloCharacter::InitParams()
 {
 	// TODO: 파람 모델화
-	bHasWeapon = false;
+	bEquipShotedable = false;
 	GetCharacterMovement()->JumpZVelocity = 1450.0f;
 	GetCharacterMovement()->GravityScale = 4.5f;
 	

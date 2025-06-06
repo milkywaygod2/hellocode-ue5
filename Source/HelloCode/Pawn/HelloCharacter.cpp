@@ -94,7 +94,7 @@ void AHelloCharacter::InitCamera()
 void AHelloCharacter::InitParams()
 {
 	// TODO: 파람 모델화
-	bEquipShotedable = false;
+	bEquipShottedable = false;
 	GetCharacterMovement()->JumpZVelocity = 1450.0f;
 	GetCharacterMovement()->GravityScale = 4.5f;
 	

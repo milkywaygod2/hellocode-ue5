@@ -55,7 +55,7 @@ private:
 
 	// info
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Equip, meta = (AllowPrivateAccess = "true"))
-	bool bEquipShotedable;
+	bool bEquipShottedable;
 
 	// param
 	float InputMouseTurnSpeed;
@@ -92,8 +92,8 @@ protected:
 	void TickNeck(const bool Value);
 
 public:
-	UFUNCTION(BlueprintCallable, Category = Equip) void SetEquipShotedable(const bool bNewEquipShotedable) { bEquipShotedable = bNewEquipShotedable; }
-	UFUNCTION(BlueprintCallable, Category = Equip) bool GetEquipShotedable() const { return bEquipShotedable; }
+	UFUNCTION(BlueprintCallable, Category = Equip) void SetEquipShottedable(const bool bNewEquipShottedable) { bEquipShottedable = bNewEquipShottedable; }
+	UFUNCTION(BlueprintCallable, Category = Equip) bool GetEquipShottedable() const { return bEquipShottedable; }
 
 	UCameraComponent* GetFirstPersonCameraComponent() const { return CameraComp; }
 	USkeletalMeshComponent* GetMesh1P() const { return Mesh1P; }

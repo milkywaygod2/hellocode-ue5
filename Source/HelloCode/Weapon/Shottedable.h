@@ -4,17 +4,18 @@
 
 #include "CoreMinimal.h"
 #include "Components/SkeletalMeshComponent.h"
-#include "Shotable.generated.h"
+#include "Shottedable.generated.h"
 
+class AHelloCharacter;
 /**
  * 
  */
 UCLASS(Blueprintable, BlueprintType, ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
-class HELLOCODE_API UShotable : public USkeletalMeshComponent
+class HELLOCODE_API UShottedable : public USkeletalMeshComponent
 {
 	GENERATED_BODY()
 public:
-	/** Can be nullptr, some Shotable-thing could be mounted out of sight like a missle in the cell */	
+	/** Can be nullptr, some Shotable-thing could be mounted out of sight like a missile in the cell */	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Shot", meta = (AllowPrivateAccess = "true"))
 	USkeletalMeshComponent* MeshCollision;
 	
@@ -43,7 +44,7 @@ public:
 	class UInputAction* ShotAction;
 
 	/** Sets default values for this component's properties */
-	UShotable();
+	UShottedable();
 
 	/** Make the weapon Shot a Projectile */
 	UFUNCTION(BlueprintCallable, Category="Weapon")

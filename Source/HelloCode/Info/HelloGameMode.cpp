@@ -29,7 +29,7 @@ void AHelloGameMode::BeginPlay()
 	// 3 Format() 가변인자 지원
 	const FString ClassName3 = TEXT("HelloGameModeEcho");
 	const FString OtherStringPart = TEXT("BeginPlay, until");
-	int32 Year = 2040;
+	const int32 Year = 2040;
 	TArray<FStringFormatArg> Args;
 	Args.Add(FStringFormatArg(ClassName3));
 	Args.Add(FStringFormatArg(OtherStringPart));

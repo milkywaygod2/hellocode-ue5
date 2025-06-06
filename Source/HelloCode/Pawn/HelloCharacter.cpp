@@ -42,9 +42,9 @@ void AHelloCharacter::InitMesh()
 		
 		GetMesh()->SetPhysicsAsset(AssetPhysics.Object); // TODO: SetPhysicsAsset 적용..
 
-		FVector MeshBounds = AssetSkeletalMesh.Object->GetBounds().BoxExtent;    
-		float CapsuleRadius = MeshBounds.Y;  // 너비(Y) 기준으로 반지름 설정
-		float CapsuleHalfHeight = MeshBounds.Z;  // 높이(Z) 기준으로 설정
+		const FVector MeshBounds = AssetSkeletalMesh.Object->GetBounds().BoxExtent;
+		const float CapsuleRadius = MeshBounds.Y;  // 너비(Y) 기준으로 반지름 설정
+		const float CapsuleHalfHeight = MeshBounds.Z;  // 높이(Z) 기준으로 설정
 		GetCapsuleComponent()->InitCapsuleSize(CapsuleRadius, CapsuleHalfHeight);
 		GetCapsuleComponent()->OnComponentBeginOverlap.AddDynamic(this, &AHelloCharacter::MyOnComponentOverlap);
 		GetCapsuleComponent()->OnComponentEndOverlap.AddDynamic(this, &AHelloCharacter::MyOnComponentEndOverlap);
@@ -168,8 +168,9 @@ void AHelloCharacter::Move(const FInputActionValue& Value)
 			OldRelativeSpringArmRot.Roll - ControllerAdjustedRot.Roll
 		));
 		
-		const FVector2D MovementVector = Value.Get<FVector2D>();
-		const float InputKeyboardMoveSpeedForwardOrBack = (MovementVector.Y >= 0) ? InputKeyboardMoveSpeedForward : InputKeyboardMoveSpeedBack;
+		const FVector2D MovementVector(Value.Get<FVector2D>());
+		const float InputKeyboardMoveSpeedForwardOrBack((MovementVector.Y >= 0) ? InputKeyboardMoveSpeedForward : InputKeyboardMoveSpeedBack);
+
 		if (MovementVector != CachedMovementVector)
 		{
 			CachedDiagonalFactor = (MovementVector.X != 0 && MovementVector.Y != 0)
@@ -291,9 +292,8 @@ void AHelloCharacter::BeginPlay()
 			Subsystem->AddMappingContext(DefaultMappingContext, 0);
 		}
 	}
-	
-	UAnimSequence* AssetAnim = LoadObject<UAnimSequence>(nullptr, TEXT("/Script/Engine.AnimSequence'/Game/FBX/jellyfish_Anim.jellyfish_Anim'"));
-	if (AssetAnim)
+
+	if (UAnimSequence* AssetAnim = LoadObject<UAnimSequence>(nullptr, TEXT("/Script/Engine.AnimSequence'/Game/FBX/jellyfish_Anim.jellyfish_Anim'")))
 	{
 		GetMesh()->SetAnimationMode(EAnimationMode::AnimationSingleNode);
 		GetMesh()->PlayAnimation(AssetAnim, true);

@@ -11,10 +11,12 @@ UCLASS(Blueprintable, BlueprintType, ClassGroup = (Custom), meta = (BlueprintSpa
 class HELLOCODE_API UPickable : public UPrimitiveComponent
 {
 	GENERATED_BODY()
-	
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Pickup", meta = (AllowPrivateAccess = "true"))
 	UPrimitiveComponent* PickupCollision;
 
 	UPickable();
+	explicit UPickable(UPrimitiveComponent* InputMesh);
 
 	UPROPERTY(BlueprintAssignable, Category = "Interaction") FOnPickUp OnPickUp;
 public:	

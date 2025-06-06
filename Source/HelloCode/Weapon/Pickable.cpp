@@ -11,6 +11,11 @@ UPickable::UPickable()
 	PickupCollision = CreateDefaultSubobject<USphereComponent>(TEXT("DefaultPickupSphere"));
 }
 
+UPickable::UPickable(UPrimitiveComponent* InputMesh)
+{
+	SetPickupMesh(InputMesh);
+}
+
 void UPickable::SetPickupMesh(UPrimitiveComponent* InputMesh)
 {
 	PickupCollision = InputMesh ? InputMesh : CreateDefaultSubobject<USphereComponent>(TEXT("DefaultPickupSphere"));

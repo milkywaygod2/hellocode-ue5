@@ -3,23 +3,52 @@
 
 #include "HelloThing.h"
 
+#include "HelloCode/Able/Pickedable.h"
+#include "HelloCode/Able/Shottedable.h"
 
-// Sets default values
+
 AHelloThing::AHelloThing()
 {
-	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
+
+	RootMeshComponent = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("RootMeshComponent"));
+	RootComponent = RootMeshComponent;
+
+	Pickedable = CreateDefaultSubobject<UPickedable>(TEXT("PickedableComponent"));
+	Pickedable->SetupAttachment(RootComponent);
 }
 
-// Called when the game starts or when spawned
 void AHelloThing::BeginPlay()
 {
-	Super::BeginPlay();
-	
+	Super::BeginPlay();	
+	//AddDynamicAbilityComponent(UShottedable::StaticClass());
 }
 
-// Called every frame
-void AHelloThing::Tick(float DeltaTime)
+void AHelloThing::AddDynamicAbilityComponent(const TSubclassOf<UPrimitiveComponent> AddAbilityClass)
+{
+	if (!AddAbilityClass) return;
+	const TObjectPtr<UPrimitiveComponent> NewAbility = NewObject<UPrimitiveComponent>(this, AddAbilityClass.Get());
+	NewAbility->SetupAttachment(Pickedable);	// 붙이는 윔치는 고정
+	NewAbility->RegisterComponent();
+	TSetAbility.Add(NewAbility);
+}
+
+void AHelloThing::RemoveDynamicAbilityComponent(const TSubclassOf<UPrimitiveComponent> RemoveAbilityClass)
+{
+	if (!RemoveAbilityClass) return;
+
+	for (const TObjectPtr Ability : TSetAbility)
+	{
+		if (Ability && Ability->GetClass() == RemoveAbilityClass.Get())
+		{
+			TSetAbility.Remove(Ability);
+			if (IsValid(Ability)) Ability->DestroyComponent();
+			break;
+		}
+	}
+}
+
+void AHelloThing::Tick(const float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 }

@@ -6,20 +6,32 @@
 #include "GameFramework/Actor.h"
 #include "HelloThing.generated.h"
 
+class UPickedable;
+
 UCLASS()
 class HELLOCODE_API AHelloThing : public AActor
 {
 	GENERATED_BODY()
 
 public:
-	// Sets default values for this actor's properties
 	AHelloThing();
 
 protected:
-	// Called when the game starts or when spawned
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="ppAbleSystem")
+	TObjectPtr<UPrimitiveComponent> RootMeshComponent;
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="ppAbleSystem")
+	TObjectPtr<UPickedable> Pickedable;	
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="ppAbleSystem")
+	TSet<TObjectPtr<UPrimitiveComponent>> TSetAbility;
+
 	virtual void BeginPlay() override;
 
+	UFUNCTION(BlueprintCallable, Category="ppAbleSystem")
+	void AddDynamicAbilityComponent(const TSubclassOf<UPrimitiveComponent> AddAbilityClass);
+	void RemoveDynamicAbilityComponent(const TSubclassOf<UPrimitiveComponent> RemoveAbilityClass); // 사실 비활성화만 해도 충분.. 객체소멸시 자동해제
+	
 public:
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
+	virtual void Tick(const float DeltaTime) override;
 };

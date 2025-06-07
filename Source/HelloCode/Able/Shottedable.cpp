@@ -5,14 +5,14 @@
 
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
-#include "HelloProjectile.h"
+#include "HelloCode/Actor/HelloProjectile.h"
 #include "HelloCode/Pawn/HelloCharacter.h"
 #include "Kismet/GameplayStatics.h"
 
 UShottedable::UShottedable()
 {
 	// Default offset from the character location for projectiles to spawn
-	MuzzleOffset = FVector(100.0f, 0.0f, 10.0f); // incase of gun
+	MuzzleOffset = FVector(100.0f, 0.0f, 10.0f); // incaseof gun
 }
 
 void UShottedable::Shot()

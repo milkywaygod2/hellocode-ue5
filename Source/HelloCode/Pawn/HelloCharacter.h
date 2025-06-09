@@ -28,7 +28,7 @@ private:
 	// mesh -> main mesh : GetMesh()
 	/** temp mesh: 1st person view (arms; seen only by self) */
 	UPROPERTY(VisibleDefaultsOnly, Category=Mesh)
-	USkeletalMeshComponent* Mesh1P;
+	USkeletalMeshComponent* Mesh1P; // 기본매쉬외 1인칭용 메쉬
 	
 	// camera
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))

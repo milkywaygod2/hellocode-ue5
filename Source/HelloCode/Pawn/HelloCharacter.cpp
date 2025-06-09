@@ -35,7 +35,7 @@ void AHelloCharacter::InitMesh()
 	const ConstructorHelpers::FObjectFinder<UPhysicsAsset> AssetPhysics(TEXT("PhysicsAsset'/Game/FBX/jellyfish_PhysicsAsset.jellyfish_PhysicsAsset'"));
 	
 	if (AssetSkeletalMesh.Succeeded() && AssetPhysics.Succeeded())
-	{		
+	{
 		GetMesh()->SetSkeletalMesh(AssetSkeletalMesh.Object);
 		GetMesh()->SetRelativeLocation(FVector(0.0f, 0.0f, 0));
 		GetMesh()->SetRelativeRotation(FRotator(0.0f, -90.0f, 0.0f));

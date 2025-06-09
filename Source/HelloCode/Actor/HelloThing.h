@@ -17,8 +17,8 @@ public:
 	AHelloThing();
 
 protected:
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="ppAbleSystem")
-	TObjectPtr<UPrimitiveComponent> RootMeshComponent;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="ppAbleSystem")
+	TObjectPtr<UPrimitiveComponent> RootMesh;
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="ppAbleSystem")
 	TObjectPtr<UPickedable> Pickedable;	

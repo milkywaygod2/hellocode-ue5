@@ -10,9 +10,9 @@
 AHelloThing::AHelloThing()
 {
 	PrimaryActorTick.bCanEverTick = true;
-
-	RootMeshComponent = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("RootMeshComponent"));
-	RootComponent = RootMeshComponent;
+	
+	RootMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("RootMeshComponent"));
+	RootComponent = RootMesh;
 
 	Pickedable = CreateDefaultSubobject<UPickedable>(TEXT("PickedableComponent"));
 	Pickedable->SetupAttachment(RootComponent);

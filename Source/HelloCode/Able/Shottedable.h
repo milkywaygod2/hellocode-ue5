@@ -15,7 +15,7 @@ class HELLOCODE_API UShottedable : public USkeletalMeshComponent
 {
 	GENERATED_BODY()
 public:
-	/** Can be nullptr, some Shotable-thing could be mounted out of sight like a missile in the cell */	
+	/** Can be nullptr, some Shottedable-thing could be mounted out of sight like a missile in the cell */	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Shot", meta = (AllowPrivateAccess = "true"))
 	USkeletalMeshComponent* MeshCollision;
 	
@@ -31,7 +31,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay)
 	UAnimMontage* ShotAnimation;
 
-	/** Gun muzzle's offset from the characters location */
+	/** Gun muzzle's offset from the character's location */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Gameplay)
 	FVector MuzzleOffset;
 

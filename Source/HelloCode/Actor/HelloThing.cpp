@@ -11,7 +11,7 @@ AHelloThing::AHelloThing()
 {
 	PrimaryActorTick.bCanEverTick = true;
 	
-	RootMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("RootMeshComponent"));
+	RootMesh = CreateDefaultSubobject<UPrimitiveComponent>(TEXT("RootMeshComponent")); // TODO: BP매핑 잘되는지 확인
 	RootComponent = RootMesh;
 
 	Pickedable = CreateDefaultSubobject<UPickedable>(TEXT("PickedableComponent"));

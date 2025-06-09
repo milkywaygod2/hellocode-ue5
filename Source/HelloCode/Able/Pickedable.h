@@ -3,25 +3,25 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Components/SphereComponent.h"
 #include "HelloCode/Pawn/HelloCharacter.h"
 #include "Pickedable.generated.h"
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnPickUp, AHelloCharacter*, PickUpCharacter);
 
 UCLASS(Blueprintable, BlueprintType, ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
-class HELLOCODE_API UPickedable : public UPrimitiveComponent
+class HELLOCODE_API UPickedable : public USphereComponent
 {
 	GENERATED_BODY()
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Pickup", meta = (AllowPrivateAccess = "true"))
-	UPrimitiveComponent* PickupCollision;
+	USphereComponent* PickedableAreaMesh;
 
 	UPickedable();
-	explicit UPickedable(UPrimitiveComponent* InputMesh);
 
 public:	
 	UPROPERTY(BlueprintAssignable, Category = "Interaction") FOnPickUp OnPickUp;
-	void SetPickupMesh(UPrimitiveComponent* InputMesh);
-	UPrimitiveComponent* GetPickupMesh() const { return PickupCollision; }
+	void SetPickedableAreaMesh(UPrimitiveComponent* InputMesh);
+	UPrimitiveComponent* GetPickedableAreaMesh() const { return PickedableAreaMesh; }
 	
 protected:
 	// Called when the game starts

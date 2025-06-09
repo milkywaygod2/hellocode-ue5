@@ -3,29 +3,15 @@
 
 #include "Pickedable.h"
 
-#include "Components/SphereComponent.h"
-
 UPickedable::UPickedable()
 {
 	PrimaryComponentTick.bCanEverTick = true;
-	PickupCollision = CreateDefaultSubobject<USphereComponent>(TEXT("DefaultPickupSphere"));
+	PickedableAreaMesh = CreateDefaultSubobject<USphereComponent>(TEXT("DefaultPickedableSphere"));
+	PickedableAreaMesh->SetHiddenInGame(true);
+	PickedableAreaMesh->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+	PickedableAreaMesh->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
 }
 
-UPickedable::UPickedable(UPrimitiveComponent* InputMesh)
-{
-	SetPickupMesh(InputMesh);
-}
-
-void UPickedable::SetPickupMesh(UPrimitiveComponent* InputMesh)
-{
-	PickupCollision = InputMesh ? InputMesh : CreateDefaultSubobject<USphereComponent>(TEXT("DefaultPickupSphere"));
-
-	PickupCollision->SetGenerateOverlapEvents(true);
-	PickupCollision->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
-	PickupCollision->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
-}
-
-// Called when the game starts
 void UPickedable::BeginPlay()
 {
 	Super::BeginPlay();
@@ -33,8 +19,6 @@ void UPickedable::BeginPlay()
 	//OnPickUp.AddDynamic(GetOwner<AHelloCharacter>(), &AHelloCharacter::HandlePickUp); // 현재는 브로드케스이후 실행되는것이 없음
 }
 
-
-// Called every frame
 void UPickedable::TickComponent(const float DeltaTime, const ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);

@@ -24,7 +24,7 @@ protected:
 	TObjectPtr<UPickedable> Pickedable;	
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="ppAbleSystem")
-	TSet<TObjectPtr<UPrimitiveComponent>> TSetAbility;
+	TSet<TObjectPtr<UPrimitiveComponent>> TSetAbility; // TODO: UPrimitiveComponent를 별도의 IEdable로 변경
 
 	virtual void BeginPlay() override;
 

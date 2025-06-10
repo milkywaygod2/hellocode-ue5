@@ -12,25 +12,23 @@ UCLASS(Blueprintable, BlueprintType, ClassGroup = (Custom), meta = (BlueprintSpa
 class HELLOCODE_API UPickedable : public USphereComponent
 {
 	GENERATED_BODY()
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Pickup", meta = (AllowPrivateAccess = "true"))
-	USphereComponent* PickedableAreaMesh;
-
+public:
 	UPickedable();
 
-public:	
-	UPROPERTY(BlueprintAssignable, Category = "Interaction") FOnPickUp OnPickUp;
-	void SetPickedableAreaMesh(UPrimitiveComponent* InputMesh);
-	UPrimitiveComponent* GetPickedableAreaMesh() const { return PickedableAreaMesh; }
-	
+private:
+	float PickedableSphereRadius;
+
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
+	UFUNCTION()	void OnSphereBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
-public:
-	// Called every frame
+public:		
+	UPROPERTY(BlueprintAssignable, Category = "Interaction") FOnPickUp OnPickUp;
+
 	virtual void TickComponent(const float DeltaTime, const ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
-	UFUNCTION()
-	void OnPrimitiveBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+	float GetPickedableSphereRadius() const { return PickedableSphereRadius; }
+	void SetPickedableSphereRadius(const float Radius) { this->PickedableSphereRadius = Radius; }
+public:
 };

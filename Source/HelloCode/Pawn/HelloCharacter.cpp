@@ -2,7 +2,7 @@
 
 
 #include "HelloCharacter.h"
-//#include "HelloShooterProjectile.h"
+#include "HelloCode/Actor/HelloProjectile.h"
 
 #include "Animation/AnimInstance.h"
 #include "Camera/CameraComponent.h"

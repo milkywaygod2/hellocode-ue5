@@ -24,13 +24,13 @@ protected:
 	TObjectPtr<UPickedable> Pickedable;	
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="ppAbleSystem")
-	TSet<TObjectPtr<UPrimitiveComponent>> TSetAbility; // TODO: UPrimitiveComponent를 별도의 IEdable로 변경
+	TSet<TObjectPtr<UActorComponent>> TSetAbility; // TODO: IEdable로 변경
 
 	virtual void BeginPlay() override;
 
 	UFUNCTION(BlueprintCallable, Category="ppAbleSystem")
-	void AddDynamicAbilityComponent(const TSubclassOf<UPrimitiveComponent> AddAbilityClass);
-	void RemoveDynamicAbilityComponent(const TSubclassOf<UPrimitiveComponent> RemoveAbilityClass); // 사실 비활성화만 해도 충분.. 객체소멸시 자동해제
+	void AddDynamicAbilityComponent(const TSubclassOf<UActorComponent> AddAbilityClass);
+	void RemoveDynamicAbilityComponent(const TSubclassOf<UActorComponent> RemoveAbilityClass); // 사실 비활성화만 해도 충분.. 객체소멸시 자동해제
 	
 public:
 	virtual void Tick(const float DeltaTime) override;

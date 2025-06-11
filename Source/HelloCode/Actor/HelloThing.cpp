@@ -11,11 +11,8 @@ AHelloThing::AHelloThing()
 {
 	PrimaryActorTick.bCanEverTick = true;
 	
-	RootMesh = CreateDefaultSubobject<UPrimitiveComponent>(TEXT("RootMeshComponent")); // TODO: BP매핑 잘되는지 확인
-	RootComponent = RootMesh;
-
+	RootComponent = RootMesh = CreateDefaultSubobject<UPrimitiveComponent>(TEXT("RootMeshComponent")); // TODO: BP매핑 잘되는지 확인
 	Pickedable = CreateDefaultSubobject<UPickedable>(TEXT("PickedableComponent"));
-	Pickedable->SetupAttachment(RootComponent);
 }
 
 void AHelloThing::BeginPlay()
@@ -24,16 +21,19 @@ void AHelloThing::BeginPlay()
 	//AddDynamicAbilityComponent(UShottedable::StaticClass());
 }
 
-void AHelloThing::AddDynamicAbilityComponent(const TSubclassOf<UPrimitiveComponent> AddAbilityClass)
+void AHelloThing::AddDynamicAbilityComponent(const TSubclassOf<UActorComponent> AddAbilityClass)
 {
 	if (!AddAbilityClass) return;
-	const TObjectPtr<UPrimitiveComponent> NewAbility = NewObject<UPrimitiveComponent>(this, AddAbilityClass.Get());
-	NewAbility->SetupAttachment(Pickedable);	// 붙이는 윔치는 고정
+	const TObjectPtr<UActorComponent> NewAbility = NewObject<UActorComponent>(this, AddAbilityClass.Get());
+	if (USceneComponent* AttachableAbility = Cast<USceneComponent>(NewAbility))
+	{
+		AttachableAbility->SetupAttachment(RootMesh);	// 붙이는 위치는 고정
+	}
 	NewAbility->RegisterComponent();
 	TSetAbility.Add(NewAbility);
 }
 
-void AHelloThing::RemoveDynamicAbilityComponent(const TSubclassOf<UPrimitiveComponent> RemoveAbilityClass)
+void AHelloThing::RemoveDynamicAbilityComponent(const TSubclassOf<UActorComponent> RemoveAbilityClass)
 {
 	if (!RemoveAbilityClass) return;
 

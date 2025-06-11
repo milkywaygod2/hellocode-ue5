@@ -3,19 +3,26 @@
 
 #include "Pickedable.h"
 
-UPickedable::UPickedable() : Super(), PickedableSphereRadius(0.0f)
+UPickedable::UPickedable() : PickedableSphereRadius(1.0f)
 {
 	PrimaryComponentTick.bCanEverTick = true;
-	SetHiddenInGame(true);
-	SetSphereRadius(PickedableSphereRadius);
-	UPrimitiveComponent::SetCollisionEnabled(ECollisionEnabled::QueryOnly);
-	UPrimitiveComponent::SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
+
+	PickedableSphere = CreateDefaultSubobject<USphereComponent>(TEXT("DefaultPickedableSphere"));
+	PickedableSphere->SetHiddenInGame(true);	
+	PickedableSphere->SetSphereRadius(PickedableSphereRadius); // 컴포넌트가 완전히 초기화된 후 반영
+	PickedableSphere->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+	PickedableSphere->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
+}
+
+void UPickedable::PostInitProperties()
+{
+	Super::PostInitProperties();    
 }
 
 void UPickedable::BeginPlay()
 {
 	Super::BeginPlay();
-	OnComponentBeginOverlap.AddDynamic(this, &UPickedable::OnSphereBeginOverlap);
+	PickedableSphere->OnComponentBeginOverlap.AddDynamic(this, &UPickedable::OnSphereBeginOverlap);
 	//OnPickUp.AddDynamic(GetOwner<AHelloCharacter>(), &AHelloCharacter::HandlePickUp); // 현재는 브로드케스이후 실행되는것이 없음
 }
 
@@ -30,7 +37,7 @@ void UPickedable::OnSphereBeginOverlap(UPrimitiveComponent* OverlappedComponent,
 	if(AHelloCharacter* Character = Cast<AHelloCharacter>(OtherActor))
 	{
 		OnPickUp.Broadcast(Character);
-		OnComponentBeginOverlap.RemoveAll(this);
+		PickedableSphere->OnComponentBeginOverlap.RemoveAll(this);
 	}
 }
 

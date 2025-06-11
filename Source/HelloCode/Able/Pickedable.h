@@ -9,13 +9,16 @@
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnPickUp, AHelloCharacter*, PickUpCharacter);
 
 UCLASS(Blueprintable, BlueprintType, ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
-class HELLOCODE_API UPickedable : public USphereComponent
+class HELLOCODE_API UPickedable : public UActorComponent
 {
 	GENERATED_BODY()
 public:
 	UPickedable();
 
 private:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Pickup", meta = (AllowPrivateAccess = "true"))
+	USphereComponent* PickedableSphere;
+
 	float PickedableSphereRadius;
 
 protected:
@@ -27,7 +30,7 @@ public:
 	UPROPERTY(BlueprintAssignable, Category = "Interaction") FOnPickUp OnPickUp;
 
 	virtual void TickComponent(const float DeltaTime, const ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
-
+	void PostInitProperties() override;
 	float GetPickedableSphereRadius() const { return PickedableSphereRadius; }
 	void SetPickedableSphereRadius(const float Radius) { this->PickedableSphereRadius = Radius; }
 public:

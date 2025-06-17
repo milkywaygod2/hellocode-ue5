@@ -3,27 +3,21 @@
 
 #include "Pickedable.h"
 
-UPickedable::UPickedable() : PickedableSphereRadius(1.0f)
+UPickedable::UPickedable()
 {
 	PrimaryComponentTick.bCanEverTick = true;
 
 	PickedableSphere = CreateDefaultSubobject<USphereComponent>(TEXT("DefaultPickedableSphere"));
-	PickedableSphere->SetHiddenInGame(true);	
-	PickedableSphere->SetSphereRadius(PickedableSphereRadius); // 컴포넌트가 완전히 초기화된 후 반영
+	PickedableSphere->SetHiddenInGame(true);
+	PickedableSphere->SetSphereRadius(1.0f); // 컴포넌트가 완전히 초기화된 후 반영
 	PickedableSphere->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 	PickedableSphere->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
-}
-
-void UPickedable::PostInitProperties()
-{
-	Super::PostInitProperties();    
 }
 
 void UPickedable::BeginPlay()
 {
 	Super::BeginPlay();
 	PickedableSphere->OnComponentBeginOverlap.AddDynamic(this, &UPickedable::OnSphereBeginOverlap);
-	//OnPickUp.AddDynamic(GetOwner<AHelloCharacter>(), &AHelloCharacter::HandlePickUp); // 현재는 브로드케스이후 실행되는것이 없음
 }
 
 void UPickedable::TickComponent(const float DeltaTime, const ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)

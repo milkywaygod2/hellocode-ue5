@@ -4,7 +4,7 @@
 #include "HelloThing.h"
 
 #include "HelloCode/Able/Pickedable.h"
-#include "HelloCode/Able/Shottedable.h"
+#include "HelloCode/Able/Shotable.h"
 
 
 AHelloThing::AHelloThing()
@@ -13,12 +13,15 @@ AHelloThing::AHelloThing()
 	
 	RootComponent = RootMesh = CreateDefaultSubobject<UPrimitiveComponent>(TEXT("RootMeshComponent")); // TODO: BP매핑 잘되는지 확인
 	Pickedable = CreateDefaultSubobject<UPickedable>(TEXT("PickedableComponent"));
+	Pickedable->GetPickedableSphere()->SetupAttachment(RootMesh);
 }
 
 void AHelloThing::BeginPlay()
 {
 	Super::BeginPlay();	
-	//AddDynamicAbilityComponent(UShottedable::StaticClass());
+	AddDynamicAbilityComponent(UShotable::StaticClass());
+	Pickedable->OnPickUp.AddDynamic(TSetAbility.Find(UShotable::StaticClass())->, &UShotable::AttachWeapon);
+
 }
 
 void AHelloThing::AddDynamicAbilityComponent(const TSubclassOf<UActorComponent> AddAbilityClass)

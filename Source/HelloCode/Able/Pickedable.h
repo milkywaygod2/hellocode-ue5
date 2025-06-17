@@ -19,10 +19,7 @@ private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Pickup", meta = (AllowPrivateAccess = "true"))
 	USphereComponent* PickedableSphere;
 
-	float PickedableSphereRadius;
-
 protected:
-	// Called when the game starts
 	virtual void BeginPlay() override;
 	UFUNCTION()	void OnSphereBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
@@ -30,8 +27,5 @@ public:
 	UPROPERTY(BlueprintAssignable, Category = "Interaction") FOnPickUp OnPickUp;
 
 	virtual void TickComponent(const float DeltaTime, const ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
-	void PostInitProperties() override;
-	float GetPickedableSphereRadius() const { return PickedableSphereRadius; }
-	void SetPickedableSphereRadius(const float Radius) { this->PickedableSphereRadius = Radius; }
-public:
+	USphereComponent* GetPickedableSphere() const { return PickedableSphere; }public:
 };

@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "Shottedable.h"
+#include "Shotable.h"
 
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
@@ -9,19 +9,19 @@
 #include "HelloCode/Pawn/HelloCharacter.h"
 #include "Kismet/GameplayStatics.h"
 
-UShottedable::UShottedable()
+UShotable::UShotable()
 {
 	// Default offset from the character location for projectiles to spawn
 	MuzzleOffset = FVector(100.0f, 0.0f, 10.0f); // incaseof gun
 }
 
-void UShottedable::Shot()
+void UShotable::Shot()
 {
-	if (Character == nullptr || Character->GetController() == nullptr) return;
+	if (AbledCharacter == nullptr || AbledCharacter->GetController() == nullptr) return;
 	
 	if (UWorld* const World = GetWorld(); World && ShotProjectile)
 	{
-		const APlayerController* PlayerController = Cast<APlayerController>(Character->GetController());
+		const APlayerController* PlayerController = Cast<APlayerController>(AbledCharacter->GetController());
 		const FRotator SpawnRotation = PlayerController->PlayerCameraManager->GetCameraRotation();
 		const FVector SpawnLocation = GetOwner()->GetActorLocation() + SpawnRotation.RotateVector(MuzzleOffset);
 
@@ -36,27 +36,27 @@ void UShottedable::Shot()
 	// 2.사운드 재생
 	if (ShotSound)
 	{
-		UGameplayStatics::PlaySoundAtLocation(this, ShotSound, Character->GetActorLocation());
+		UGameplayStatics::PlaySoundAtLocation(this, ShotSound, AbledCharacter->GetActorLocation());
 	}
 	
 	// 3.애니메이션 재생
-	if (UAnimInstance* AnimInstance = Character->GetMesh1P()->GetAnimInstance(); AnimInstance && ShotAnimation)
+	if (UAnimInstance* AnimInstance = AbledCharacter->GetMesh1P()->GetAnimInstance(); AnimInstance && ShotAnimation)
 	{
 		AnimInstance->Montage_Play(ShotAnimation, 1.f);
 	}
 }
 
-void UShottedable::AttachWeapon(AHelloCharacter* TargetCharacter)
+void UShotable::AttachWeapon(AHelloCharacter* TargetCharacter)
 {
-	Character = TargetCharacter;
-	if (Character == nullptr || Character->GetEquipShottedable()) return;
+	AbledCharacter = TargetCharacter;
+	if (AbledCharacter == nullptr || AbledCharacter->GetEquipShottedable()) return;
 	
 	// Attach the weapon to the First Person Character
 	const FAttachmentTransformRules AttachmentRules(EAttachmentRule::SnapToTarget, true);
-	AttachToComponent(Character->GetMesh1P(), AttachmentRules, FName(TEXT("GripPoint")));
-	Character->SetEquipShottedable(true);
+	AttachToComponent(AbledCharacter->GetMesh1P(), AttachmentRules, FName(TEXT("GripPoint")));
+	AbledCharacter->SetEquipShottedable(true);
 
-	if (const APlayerController* PlayerController = Cast<APlayerController>(Character->GetController()))
+	if (const APlayerController* PlayerController = Cast<APlayerController>(AbledCharacter->GetController()))
 	{
 		// 1. 인풋 키매핑 컨텍스트 추가
 		if (UEnhancedInputLocalPlayerSubsystem* PlayerEnhancedInputSubsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
@@ -67,17 +67,17 @@ void UShottedable::AttachWeapon(AHelloCharacter* TargetCharacter)
 		// 2. 인풋 콜백함수 바인딩
 		if (UEnhancedInputComponent* PlayerEnhancedInput = Cast<UEnhancedInputComponent>(PlayerController->InputComponent))
 		{
-			PlayerEnhancedInput->BindAction(ShotAction, ETriggerEvent::Triggered, this, &UShottedable::Shot);
+			PlayerEnhancedInput->BindAction(ShotAction, ETriggerEvent::Triggered, this, &UShotable::Shot);
 		}
 	}
 }
 
-void UShottedable::EndPlay(const EEndPlayReason::Type EndPlayReason)
+void UShotable::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
 	Super::EndPlay(EndPlayReason);
-	if (Character == nullptr) return;
+	if (AbledCharacter == nullptr) return;
 
-	if (const APlayerController* PlayerController = Cast<APlayerController>(Character->GetController()))
+	if (const APlayerController* PlayerController = Cast<APlayerController>(AbledCharacter->GetController()))
 	{
 		// 3. 인풋 키매핑 컨텍스트 제거
 		if (UEnhancedInputLocalPlayerSubsystem* PlayerEnhancedInputSubsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))

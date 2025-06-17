@@ -4,23 +4,28 @@
 
 #include "CoreMinimal.h"
 #include "Components/SkeletalMeshComponent.h"
-#include "Shottedable.generated.h"
+#include "Shotable.generated.h"
 
 class AHelloCharacter;
 /**
  * 
  */
 UCLASS(Blueprintable, BlueprintType, ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
-class HELLOCODE_API UShottedable : public USkeletalMeshComponent
+class HELLOCODE_API UShotable : public USkeletalMeshComponent
 {
 	GENERATED_BODY()
 
 public:
-	UShottedable();
+	UShotable();
 
 private:
-	AHelloCharacter* Character;
-	
+	AHelloCharacter* AbledCharacter;
+
+public:
+	AHelloCharacter* GetAbledCharacter() const { return AbledCharacter; }
+
+	void SetAbledCharacter(AHelloCharacter* AbledCharacter) { this->AbledCharacter = AbledCharacter; }
+
 protected:
 	UFUNCTION() virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 	

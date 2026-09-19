@@ -20,7 +20,10 @@ void AHelloThing::BeginPlay()
 {
 	Super::BeginPlay();	
 	AddDynamicAbilityComponent(UShotable::StaticClass());
-	Pickedable->OnPickUp.AddDynamic(TSetAbility.Find(UShotable::StaticClass())->, &UShotable::AttachWeapon);
+	// TODO: 주운 순간 Shotable 의 AttachWeapon 을 물리는 배선이 아직 없다.
+	//       아래 줄은 TSetAbility.Find(...) 가 돌려준 것에서 UShotable* 를 꺼내는 자리가
+	//       비어 있어(`->` 뒤가 없다) 컴파일되지 않는다. 꺼내는 길을 정한 뒤 되살린다.
+	//Pickedable->OnPickUp.AddDynamic(TSetAbility.Find(UShotable::StaticClass())->, &UShotable::AttachWeapon);
 
 }
 

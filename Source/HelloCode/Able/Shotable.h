@@ -24,7 +24,7 @@ private:
 public:
 	AHelloCharacter* GetAbledCharacter() const { return AbledCharacter; }
 
-	void SetAbledCharacter(AHelloCharacter* AbledCharacter) { this->AbledCharacter = AbledCharacter; }
+	void SetAbledCharacter(AHelloCharacter* Character) { AbledCharacter = Character; }
 
 protected:
 	UFUNCTION() virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
